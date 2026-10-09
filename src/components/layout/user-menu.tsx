@@ -2,6 +2,7 @@
 
 import { Briefcase, LayoutDashboard, LogOut, MessageSquare, Settings, Shield, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { useTransition } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -23,6 +24,8 @@ export interface HeaderUser {
 }
 
 export function UserMenu({ user }: { user: HeaderUser }) {
+  const [signingOut, startSignOut] = useTransition();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink" aria-label="Open account menu">
@@ -71,13 +74,10 @@ export function UserMenu({ user }: { user: HeaderUser }) {
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuSeparator />
-        <form action={signOutAction}>
-          <DropdownMenuItem asChild>
-            <button type="submit" className="w-full">
-              <LogOut /> Log out
-            </button>
-          </DropdownMenuItem>
-        </form>
+        {/* Called directly: the menu unmounts on select, so a <form> inside it would never submit. */}
+        <DropdownMenuItem disabled={signingOut} onSelect={() => startSignOut(() => signOutAction())}>
+          <LogOut /> {signingOut ? "Logging out…" : "Log out"}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { signUp, uniqueEmail } from "./helpers";
 
 /** Runs in the "mobile" project (Pixel 7 viewport). */
 const PAGES = ["/", "/gigs", "/specialists", "/categories", "/how-it-works", "/login", "/signup", "/contact"];
@@ -18,6 +19,15 @@ test.describe("mobile layout", () => {
     await page.getByRole("dialog").getByRole("link", { name: "Explore gigs" }).click();
     await expect(page).toHaveURL(/\/gigs/);
     await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
+  test("signed-in users can log out from the mobile menu", async ({ page }) => {
+    await signUp(page, { name: "Mo Mobile", email: uniqueEmail("mobile"), role: "buyer" });
+    await page.getByRole("button", { name: "Open menu" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Log out" }).click();
+    await page.waitForURL((url) => url.pathname === "/");
+    await page.goto("/dashboard/buyer");
+    await expect(page).toHaveURL(/\/login/);
   });
 
   test("gig filters are collapsible on small screens", async ({ page }) => {

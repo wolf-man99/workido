@@ -177,6 +177,9 @@ test("a completed order accepts exactly one review, and the buyer can hire again
   await page.goto(orderUrl);
   await page.getByRole("link", { name: "Hire again" }).click();
   await expect(page.getByText(`${specialist.name} will be invited to this task automatically`)).toBeVisible();
+  // Only non-sensitive details are reused: a follow-up title and the category.
+  await expect(page.getByLabel("Task title")).toHaveValue(`Follow-up: ${serviceTitle}`);
+  await expect(page.getByLabel("Detailed description")).toHaveValue("");
 });
 
 test("buyer posts a custom requirement and accepts an offer", async ({ page }) => {

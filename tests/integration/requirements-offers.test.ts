@@ -51,6 +51,23 @@ describe("requirements, invitations and offers", () => {
     expect(specialistView).toEqual([]);
   });
 
+  it("lets the owner edit their requirement and its draft", async () => {
+    const { data: updated, error } = await buyer.client
+      .from("requirements")
+      .update({ budget_max_minor: 250000, title: "Carousel for our product launch" })
+      .eq("id", requirementId)
+      .select("title, budget_max_minor")
+      .single();
+    expect(error).toBeNull();
+    expect(updated).toEqual({ title: "Carousel for our product launch", budget_max_minor: 250000 });
+
+    const { data: draft } = await buyer.client.from("requirements").insert({ buyer_id: buyer.id, title: "Draft to finish later", status: "draft" }).select("id").single();
+    const { error: openTooEarly } = await buyer.client.from("requirements").update({ status: "open" }).eq("id", draft!.id);
+    expect(openTooEarly?.code).toBe("23514");
+    const { error: deleteDraft } = await buyer.client.from("requirements").delete().eq("id", draft!.id);
+    expect(deleteDraft).toBeNull();
+  });
+
   it("does not let buyers mark a requirement hired directly", async () => {
     const { error } = await buyer.client.from("requirements").update({ status: "hired" }).eq("id", requirementId);
     expect(error).not.toBeNull();

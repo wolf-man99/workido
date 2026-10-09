@@ -6,6 +6,7 @@ import { requireActiveUser } from "@/lib/auth/session";
 import { listCategories } from "@/lib/data/marketplace";
 import { skillOptions } from "@/lib/data/options";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { uuid } from "@/lib/validation/marketplace";
 import { emptyRequirement } from "@/lib/validation/requirement";
 
 export const metadata: Metadata = { title: "Post a task" };
@@ -27,12 +28,37 @@ export default async function NewRequirementPage(props: PageProps<"/dashboard/bu
     else invite = { username: profile.username, fullName: profile.full_name };
   }
 
+  // "Hire again": reuse only non-sensitive details (title and category) from
+  // a previous order the user bought. Briefs, attachments and payment details
+  // are never copied.
+  let defaults = emptyRequirement;
+  const fromOrderId = typeof searchParams.from === "string" && uuid.safeParse(searchParams.from).success ? searchParams.from : null;
+  if (fromOrderId) {
+    const supabase = await createSupabaseServerClient();
+    const { data: previous } = await supabase
+      .from("orders")
+      .select("title, service_id, requirement_id, services(category_id), requirements(category_id)")
+      .eq("id", fromOrderId)
+      .eq("buyer_id", user.id)
+      .maybeSingle();
+    if (previous) {
+      const previousCategory = previous.requirements?.category_id ?? previous.services?.category_id ?? "";
+      const previousCategoryRow = categories.find((c) => c.id === previousCategory);
+      defaults = {
+        ...emptyRequirement,
+        title: `Follow-up: ${previous.title}`.slice(0, 120),
+        categoryId: previousCategoryRow?.parent_id ?? previousCategory,
+        subcategoryId: previousCategoryRow?.parent_id ? previousCategory : "",
+      };
+    }
+  }
+
   return (
     <>
       <PageHeader title="Post a task" description="Describe what you need. We'll match you with a small shortlist of suitable, available specialists." />
       {inviteProblem ? <Alert tone="warning">{inviteProblem}</Alert> : null}
       <RequirementWizard
-        defaults={emptyRequirement}
+        defaults={defaults}
         categories={categories.map((c) => ({ id: c.id, name: c.name, parentId: c.parent_id }))}
         skills={skills}
         attachments={[]}

@@ -80,5 +80,10 @@ export async function refreshMatches(supabase: ServerSupabaseClient, requirement
     );
     if (insertError) throw insertError;
   }
+  const { error: stampError } = await supabase
+    .from("requirements")
+    .update({ matches_computed_at: new Date().toISOString() })
+    .eq("id", requirementId);
+  if (stampError) throw stampError;
   return matches;
 }

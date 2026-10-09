@@ -67,7 +67,7 @@ export function OrderDetailView({ detail, viewer, viewerId }: { detail: OrderDet
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">{order.title}</h1>
-          <OrderStatusBadge status={status} />
+          <OrderStatusBadge status={status} className="self-start" />
         </div>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           {viewer === "admin" ? (
@@ -263,7 +263,7 @@ export function OrderDetailView({ detail, viewer, viewerId }: { detail: OrderDet
             {viewer === "buyer" && order.specialist ? (
               <div className="flex flex-wrap gap-2 border-t border-border pt-4">
                 <Button asChild>
-                  <Link href={`/dashboard/buyer/requirements/new?invite=${order.specialist.username}`}>
+                  <Link href={`/dashboard/buyer/requirements/new?invite=${order.specialist.username}&from=${order.id}`}>
                     <Repeat aria-hidden /> Hire again
                   </Link>
                 </Button>

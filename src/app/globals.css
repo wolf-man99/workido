@@ -7,14 +7,14 @@
  * Accessibility notes:
  *  - Orange (#FF6B35) is used as a fill with ink text (contrast ~6.9:1).
  *    It is NOT used for body text on light backgrounds; --brand-text is the
- *    darker orange used for links/text (contrast >= 4.5:1 on warm white).
+ *    darker orange used for links/text (>= 5:1 on every light surface, incl. --brand-soft).
  *  - Green is used as a fill or with its darker text variant.
  */
 :root {
   --brand: #ff6b35;
   --brand-hover: #f25a22;
   --brand-soft: #ffe7dc;
-  --brand-text: #c2410c;
+  --brand-text: #b03a0a;
   --ink: #171717;
   --ink-soft: #3d3d3d;
   --cream: #fffdf8;

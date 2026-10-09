@@ -7,8 +7,12 @@ import { formatMoney } from "@/lib/domain/money";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TONES, type OrderStatus } from "@/lib/domain/orders/state-machine";
 import { formatDate, formatRelativeTime } from "@/lib/format";
 
-export function OrderStatusBadge({ status }: { status: OrderStatus }) {
-  return <Badge tone={ORDER_STATUS_TONES[status]}>{ORDER_STATUS_LABELS[status]}</Badge>;
+export function OrderStatusBadge({ status, className }: { status: OrderStatus; className?: string }) {
+  return (
+    <Badge tone={ORDER_STATUS_TONES[status]} className={className}>
+      {ORDER_STATUS_LABELS[status]}
+    </Badge>
+  );
 }
 
 export function OrderList({ orders, viewer }: { orders: OrderListItem[]; viewer: "buyer" | "specialist" }) {

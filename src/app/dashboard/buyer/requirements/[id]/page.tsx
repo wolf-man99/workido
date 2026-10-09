@@ -26,6 +26,7 @@ import { formatBudgetRange, formatMoney } from "@/lib/domain/money";
 import { EXPERIENCE_LABELS, URGENCY_LABELS, formatDate, formatDeliveryTime, formatFileSize, formatRelativeTime } from "@/lib/format";
 import { privateFileHref } from "@/lib/storage/server";
 import type { OrderStatus } from "@/lib/domain/orders/state-machine";
+import { pluralize } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Requirement" };
 
@@ -189,7 +190,18 @@ export default async function RequirementDetailPage(props: PageProps<"/dashboard
               </ActionButton>
             </div>
           </div>
-          {matches.length === 0 ? (
+          {matches.length === 0 && !requirement.matches_computed_at ? (
+            <EmptyState
+              icon={Sparkles}
+              title="Find suitable specialists"
+              description="Run matching to get a short, ranked list of specialists for this task."
+              action={
+                <ActionButton action={refreshMatchesAction.bind(null, requirement.id)}>
+                  <Sparkles aria-hidden /> Find matches
+                </ActionButton>
+              }
+            />
+          ) : matches.length === 0 ? (
             <EmptyState
               icon={Sparkles}
               title="No strong matches right now"
@@ -267,7 +279,11 @@ export default async function RequirementDetailPage(props: PageProps<"/dashboard
             <Detail label="Budget" value={formatBudgetRange(requirement.budget_min_minor, requirement.budget_max_minor, requirement.currency)} />
             <Detail label="Deadline" value={requirement.deadline_at ? formatDate(requirement.deadline_at) : "Flexible"} icon={<Clock className="size-4" aria-hidden />} />
             <Detail label="Urgency" value={URGENCY_LABELS[requirement.urgency]} />
-            <Detail label="Items / revisions" value={`${requirement.quantity ?? "—"} items · ${requirement.revisions_expected ?? "—"} revisions`} icon={<Repeat className="size-4" aria-hidden />} />
+            <Detail
+              label="Items / revisions"
+              value={`${requirement.quantity === null ? "—" : pluralize(requirement.quantity, "item")} · ${requirement.revisions_expected === null ? "— revisions" : pluralize(requirement.revisions_expected, "revision")}`}
+              icon={<Repeat className="size-4" aria-hidden />}
+            />
             <Detail label="Experience" value={requirement.preferred_experience ? EXPERIENCE_LABELS[requirement.preferred_experience] : "No preference"} />
             <Detail label="Location" value={`${requirement.location_preference ?? "Anywhere"}${requirement.remote_ok ? " · remote OK" : ""}`} />
             <Detail
