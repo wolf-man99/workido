@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+/*
+ * Workido design tokens.
+ *
+ * Brand colours are defined once here so they can be changed centrally.
+ * Accessibility notes:
+ *  - Orange (#FF6B35) is used as a fill with ink text (contrast ~6.9:1).
+ *    It is NOT used for body text on light backgrounds; --brand-text is the
+ *    darker orange used for links/text (contrast >= 4.5:1 on warm white).
+ *  - Green is used as a fill or with its darker text variant.
+ */
+:root {
+  --brand: #ff6b35;
+  --brand-hover: #f25a22;
+  --brand-soft: #ffe7dc;
+  --brand-text: #c2410c;
+  --ink: #171717;
+  --ink-soft: #3d3d3d;
+  --cream: #fffdf8;
+  --sun: #ffd166;
+  --sun-soft: #fff4d6;
+  --mint: #35c98a;
+  --mint-soft: #ddf6ea;
+  --mint-text: #13734c;
+  --mist: #f1f2f4;
+
+  --background: var(--cream);
+  --foreground: var(--ink);
+  --card: #ffffff;
+  --muted: var(--mist);
+  --muted-foreground: #5c5f66;
+  --border: #e4e2dc;
+  --input: #d9d6cf;
+  --ring: var(--brand);
+  --danger: #c62828;
+  --danger-soft: #fdecea;
+  --warning-soft: var(--sun-soft);
+  --warning-text: #8a5a00;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-text: var(--brand-text);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-cream: var(--cream);
+  --color-sun: var(--sun);
+  --color-sun-soft: var(--sun-soft);
+  --color-mint: var(--mint);
+  --color-mint-soft: var(--mint-soft);
+  --color-mint-text: var(--mint-text);
+  --color-mist: var(--mist);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-text: var(--warning-text);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+  --shadow-soft: 0 1px 2px rgb(23 23 23 / 0.04), 0 4px 16px rgb(23 23 23 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(23 23 23 / 0.05), 0 12px 32px rgb(23 23 23 / 0.1);
+
+  --animate-fade-up: fade-up 0.35s ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: var(--sun);
+    color: var(--ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
