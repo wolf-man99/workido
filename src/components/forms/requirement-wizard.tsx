@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Check, CircleCheck, Paperclip, Plus, Trash2, X }
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -88,9 +88,10 @@ export function RequirementWizard({
   const errors = form.formState.errors;
 
   const parents = categories.filter((category) => !category.parentId);
-  const categoryId = form.watch("categoryId");
+  const values = useWatch({ control: form.control }) as RequirementInput;
+  const categoryId = values.categoryId;
   const children = categories.filter((category) => category.parentId === categoryId);
-  const selectedSkills = form.watch("skills");
+  const selectedSkills = values.skills ?? [];
   const skillLabels = useMemo(() => new Map(skills.map((skill) => [skill.id, skill.label])), [skills]);
 
   function applyFieldErrors(result: ActionResult<unknown>) {
@@ -108,11 +109,9 @@ export function RequirementWizard({
       if (!silent) toast.error(result.error);
       return null;
     }
-    if (!requirementId) {
-      setRequirementId(result.data.id);
-      // Keep the draft on refresh without a full navigation.
-      window.history.replaceState(null, "", `/dashboard/buyer/requirements/${result.data.id}/edit${invite ? `?invite=${invite.username}` : ""}`);
-    }
+    // The URL deliberately stays the same (changing routes mid-wizard would
+    // remount it); saved drafts are listed under "My requirements".
+    if (!requirementId) setRequirementId(result.data.id);
     if (!silent) toast.success("Draft saved");
     return result.data.id;
   }
@@ -192,7 +191,6 @@ export function RequirementWizard({
     );
   }
 
-  const values = form.watch();
   const budgetMin = safeMinor(values.budgetMin);
   const budgetMax = safeMinor(values.budgetMax);
   const today = new Date().toISOString().slice(0, 10);

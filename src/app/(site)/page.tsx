@@ -13,6 +13,7 @@ import {
   Star,
 } from "lucide-react";
 import Link from "next/link";
+import { unstable_rethrow } from "next/navigation";
 import { CategoryCard, ServiceCard } from "@/components/marketplace/cards";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/feedback";
@@ -25,6 +26,8 @@ async function loadHomeData(): Promise<{ categories: CategoryRow[]; services: Se
     const [categories, services] = await Promise.all([listTopLevelCategories(), searchServices({ pageSize: 8 })]);
     return { categories, services: services.items };
   } catch (error) {
+    // Let Next.js handle its own control-flow errors (e.g. dynamic rendering).
+    unstable_rethrow(error);
     console.error("[home] failed to load marketplace data", error);
     return { categories: [], services: [] };
   }

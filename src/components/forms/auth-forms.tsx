@@ -5,7 +5,7 @@ import { Briefcase, MailCheck, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { Alert } from "@/components/ui/feedback";
 import { FormField } from "@/components/ui/form-field";
@@ -82,7 +82,7 @@ export function SignUpForm({ defaultRole }: { defaultRole: "buyer" | "specialist
     resolver: zodResolver(signUpSchema),
     defaultValues: { fullName: "", email: "", password: "", role: defaultRole },
   });
-  const role = form.watch("role");
+  const role = useWatch({ control: form.control, name: "role" });
 
   const onSubmit = form.handleSubmit((values) => {
     setError(null);

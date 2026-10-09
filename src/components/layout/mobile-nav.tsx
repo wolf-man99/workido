@@ -3,7 +3,7 @@
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger, SheetContent } from "@/components/ui/overlays";
 import { signOutAction } from "@/lib/actions/auth";
@@ -14,11 +14,13 @@ const linkClass = "flex min-h-12 items-center rounded-xl px-3 text-base font-sem
 export function MobileNav({ user }: { user: HeaderUser | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const [lastPathname, setLastPathname] = useState(pathname);
 
-  // Close the menu after navigating.
-  useEffect(() => {
+  // Close the menu after navigating (adjusting state during render, not in an effect).
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
     setOpen(false);
-  }, [pathname]);
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
