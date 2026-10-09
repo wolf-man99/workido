@@ -148,6 +148,9 @@ create table public.reviews (
   order_id uuid not null references public.orders (id) on delete cascade,
   reviewer_id uuid not null references public.profiles (id) on delete cascade,
   reviewee_id uuid not null references public.profiles (id) on delete cascade,
+  -- Which side of the order the reviewee was on. Set by a trigger from the
+  -- order itself; public specialist profiles show 'specialist' reviews only.
+  reviewee_role text not null default 'specialist' constraint reviews_reviewee_role check (reviewee_role in ('specialist', 'buyer')),
   rating smallint not null constraint reviews_rating_range check (rating between 1 and 5),
   comment text constraint reviews_comment_length check (char_length(comment) <= 2000),
   created_at timestamptz not null default now(),
@@ -155,7 +158,26 @@ create table public.reviews (
   constraint reviews_not_self check (reviewer_id <> reviewee_id)
 );
 
-create index reviews_reviewee_idx on public.reviews (reviewee_id, created_at desc);
+create index reviews_reviewee_idx on public.reviews (reviewee_id, reviewee_role, created_at desc);
+
+create or replace function public.reviews_before_insert()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  select case when o.specialist_id = new.reviewee_id then 'specialist' else 'buyer' end
+    into new.reviewee_role
+    from public.orders o where o.id = new.order_id;
+  new.created_at := now();
+  return new;
+end;
+$$;
+
+create trigger reviews_before_insert
+  before insert on public.reviews
+  for each row execute function public.reviews_before_insert();
 
 -- Only the two parties of a COMPLETED order may review each other.
 create or replace function public.can_review_order(p_order_id uuid, p_reviewee_id uuid)
@@ -191,10 +213,7 @@ begin
   from (
     select count(*)::integer as cnt, round(avg(r.rating)::numeric, 2) as avg_rating
     from public.reviews r
-    join public.orders o on o.id = r.order_id
-    where r.reviewee_id = p_specialist_id
-      and o.specialist_id = p_specialist_id
-      and r.reviewer_id = o.buyer_id
+    where r.reviewee_id = p_specialist_id and r.reviewee_role = 'specialist'
   ) agg
   where sp.user_id = p_specialist_id;
 end;
@@ -454,7 +473,9 @@ security definer
 set search_path = ''
 as $$
 begin
-  perform public.refresh_specialist_rating(new.reviewee_id);
+  if new.reviewee_role = 'specialist' then
+    perform public.refresh_specialist_rating(new.reviewee_id);
+  end if;
   perform public.notify_user(new.reviewee_id, 'review_received', 'You received a ' || new.rating || '-star review',
     left(coalesce(new.comment, ''), 200), '/dashboard/orders/' || new.order_id::text, 'order', new.order_id);
   return new;

@@ -685,14 +685,14 @@ isOneToOne: false
                   ]
                 },"reviews": {
                   Row: {
-                    "comment": string | null,"created_at": string,"id": string,"order_id": string,"rating": number,"reviewee_id": string,"reviewer_id": string
+                    "comment": string | null,"created_at": string,"id": string,"order_id": string,"rating": number,"reviewee_id": string,"reviewee_role": string,"reviewer_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "comment"?: string | null,"created_at"?: string,"id"?: string,"order_id": string,"rating": number,"reviewee_id": string,"reviewer_id": string
+                    "comment"?: string | null,"created_at"?: string,"id"?: string,"order_id": string,"rating": number,"reviewee_id": string,"reviewee_role"?: string,"reviewer_id": string
                   }
                   Update: {
-                    "comment"?: string | null,"created_at"?: string,"id"?: string,"order_id"?: string,"rating"?: number,"reviewee_id"?: string,"reviewer_id"?: string
+                    "comment"?: string | null,"created_at"?: string,"id"?: string,"order_id"?: string,"rating"?: number,"reviewee_id"?: string,"reviewee_role"?: string,"reviewer_id"?: string
                   }
                   Relationships: [
                     {
@@ -747,7 +747,7 @@ isOneToOne: false
                   }
                   ComputedFields: never
                   Insert: {
-                    "buyer_instructions"?: string | null,"category_id": string,"created_at"?: string,"currency"?: string,"deliverables": string,"delivery_time_hours": number,"description": string,"id"?: string,"included_revisions"?: number,"moderation_note"?: string | null,"price_minor": number,"publication_status"?: Database["public"]['Enums']["publication_status"],"published_at"?: string | null,"slug": string,"specialist_id": string,"title": string,"updated_at"?: string
+                    "buyer_instructions"?: string | null,"category_id": string,"created_at"?: string,"currency"?: string,"deliverables": string,"delivery_time_hours": number,"description": string,"id"?: string,"included_revisions"?: number,"moderation_note"?: string | null,"price_minor": number,"publication_status"?: Database["public"]['Enums']["publication_status"],"published_at"?: string | null,"slug"?: string,"specialist_id": string,"title": string,"updated_at"?: string
                   }
                   Update: {
                     "buyer_instructions"?: string | null,"category_id"?: string,"created_at"?: string,"currency"?: string,"deliverables"?: string,"delivery_time_hours"?: number,"description"?: string,"id"?: string,"included_revisions"?: number,"moderation_note"?: string | null,"price_minor"?: number,"publication_status"?: Database["public"]['Enums']["publication_status"],"published_at"?: string | null,"slug"?: string,"specialist_id"?: string,"title"?: string,"updated_at"?: string

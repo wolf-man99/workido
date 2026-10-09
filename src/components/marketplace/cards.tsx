@@ -38,6 +38,11 @@ export function ServiceCard({ service }: { service: ServiceListing }) {
             <span className="rounded-full bg-card/80 px-3 py-1 text-xs font-semibold text-ink-soft">{service.category_name}</span>
           </div>
         )}
+        {service.specialist_is_sample ? (
+          <div className="absolute left-3 top-3">
+            <SampleBadge isSample />
+          </div>
+        ) : null}
       </div>
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex items-center gap-2">
@@ -69,11 +74,6 @@ export function ServiceCard({ service }: { service: ServiceListing }) {
             <span className="font-display text-lg font-bold text-ink">{formatMoney(service.price_minor, service.currency)}</span>
           </p>
         </div>
-        {service.specialist_is_sample ? (
-          <div className="relative z-10 -mt-1">
-            <SampleBadge isSample />
-          </div>
-        ) : null}
       </div>
     </article>
   );

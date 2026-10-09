@@ -6,7 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "VITEST_INTEGRATION=1 vitest run",
+    "test:e2e": "playwright test",
+    "db:start": "supabase start -x studio,imgproxy,edge-runtime,vector,logflare,supavisor,postgres-meta",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:lint": "supabase db lint --level warning",
+    "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts",
+    "seed:dev": "tsx scripts/seed-dev.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "5.9.1",

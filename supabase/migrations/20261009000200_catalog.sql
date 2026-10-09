@@ -120,7 +120,8 @@ create table public.services (
   specialist_id uuid not null references public.specialist_profiles (user_id) on delete cascade,
   category_id uuid not null references public.categories (id) on delete restrict,
   title text not null constraint services_title_length check (char_length(title) between 8 and 100),
-  slug text not null unique constraint services_slug_format check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
+  -- Generated from the title by services_before_write() when left empty.
+  slug text not null default '' unique constraint services_slug_format check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
   description text not null constraint services_description_length check (char_length(description) between 30 and 5000),
   deliverables text not null constraint services_deliverables_length check (char_length(deliverables) between 5 and 2000),
   -- What the buyer must provide when ordering ("Additional requirements from buyers").
