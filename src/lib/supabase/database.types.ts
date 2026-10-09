@@ -83,6 +83,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"contact_messages": {
+                  Row: {
+                    "created_at": string,"email": string,"id": string,"message": string,"name": string,"status": string,"topic": string,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"email": string,"id"?: string,"message": string,"name": string,"status"?: string,"topic": string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "created_at"?: string,"email"?: string,"id"?: string,"message"?: string,"name"?: string,"status"?: string,"topic"?: string,"user_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "contact_messages_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"conversation_participants": {
                   Row: {
                     "conversation_id": string,"created_at": string,"last_read_at": string | null,"user_id": string
@@ -1074,6 +1094,11 @@ isOneToOne: false
 "is_public_specialist":
 { Args: { "specialist": string }; Returns: boolean
                            },
+"list_my_conversations":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "conversation_id": string,"counterpart_avatar": string,"counterpart_id": string,"counterpart_name": string,"counterpart_username": string,"last_message_at": string,"last_message_body": string,"last_message_type": Database["public"]['Enums']["message_type"],"last_sender_id": string,"order_id": string,"order_number": string,"order_status": Database["public"]['Enums']["order_status"],"order_title": string,"unread_count": number
+            }[]
+                           },
 "mark_conversation_read":
 { Args: { "p_conversation_id": string }; Returns: undefined
                            },
@@ -1082,6 +1107,11 @@ isOneToOne: false
                            },
 "mark_refund_processing":
 { Args: { "p_provider_refund_id": string,"p_refund_id": string }; Returns: undefined
+                           },
+"notification_email_outbox":
+{ Args: { "p_limit"?: number }; Returns: {
+              "body": string,"created_at": string,"email": string,"email_enabled": boolean,"full_name": string,"link_path": string,"notification_id": string,"title": string,"type": string,"user_id": string
+            }[]
                            },
 "notify_user":
 { Args: { "p_body": string,"p_entity_id"?: string,"p_entity_type"?: string,"p_link_path": string,"p_title": string,"p_type": string,"p_user_id": string }; Returns: undefined

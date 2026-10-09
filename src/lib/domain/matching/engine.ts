@@ -265,10 +265,15 @@ export function scoreCandidate(
   return {
     specialistId: candidate.specialistId,
     score,
-    label: score >= 75 ? "Strong match" : score >= 55 ? "Good match" : "Possible match",
+    label: matchLabel(score),
     reasons,
     components,
   };
+}
+
+/** Qualitative label shown to buyers instead of the raw score. */
+export function matchLabel(score: number): ScoredMatch["label"] {
+  return score >= 75 ? "Strong match" : score >= 55 ? "Good match" : "Possible match";
 }
 
 export function rankCandidates(

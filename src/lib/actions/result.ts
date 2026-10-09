@@ -33,6 +33,10 @@ const USER_FACING_CODES = new Set(["23514", "42501", "P0002", "22023"]);
 
 export function fromDbError(error: PostgrestError | null | undefined, fallback = "Something went wrong. Please try again."): ActionResult<never> {
   if (!error) return fail(fallback);
+  // CHECK constraint violations share SQLSTATE 23514 but carry technical text.
+  if (/violates (check|foreign key|not-null) constraint/i.test(error.message)) {
+    return fail("Some details are missing or invalid. Please review the form and try again.");
+  }
   if (error.code && USER_FACING_CODES.has(error.code) && error.message) {
     return fail(error.message);
   }
