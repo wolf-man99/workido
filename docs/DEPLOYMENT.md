@@ -4,7 +4,7 @@ Target setup: **Supabase** (database, auth, storage, realtime) + **Vercel** (Nex
 
 ## 1. Supabase project
 
-The project for this repository is `bquiwujcuynajxrxequh` (`https://bquiwujcuynajxrxequh.supabase.co`). At the time of writing it has no schema yet.
+The project for this repository is `bquiwujcuynajxrxequh` (`https://bquiwujcuynajxrxequh.supabase.co`). All migrations up to `20261009001200` were applied through the SQL editor; a read-only check on 2026-10-09 confirmed the tables, reference data (13 categories, 44 skills), storage buckets and function permissions.
 
 ### Apply the migrations
 
@@ -17,6 +17,14 @@ npx supabase db push                                   # applies supabase/migrat
 ```
 
 Option B — SQL editor: open each file in `supabase/migrations/` in filename order and run it in Supabase → SQL Editor. (Option A is safer; it records what has been applied.)
+
+**If you used the SQL editor** (as was done for this project), the CLI has no record of what's applied, and `db push` would try to run every file again and fail. To switch to the CLI later, mark the existing files as applied once:
+
+```bash
+npx supabase migration repair --status applied 20261009000100 20261009000200 20261009000300 20261009000400 20261009000500 20261009000600 20261009000700 20261009000800 20261009000900 20261009001000 20261009001100 20261009001200
+```
+
+From then on, `npx supabase db push` applies only new files. If you keep using the SQL editor instead, run **only the new migration files**, in filename order — never re-run old ones.
 
 Migrations include the initial categories and skills. They do **not** include sample data. Do not run `npm run seed:dev` against production.
 

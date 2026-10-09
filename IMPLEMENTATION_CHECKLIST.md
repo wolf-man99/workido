@@ -16,7 +16,7 @@ _Last updated: 2026-10-09._
 | `npm run db:lint` | No schema errors |
 | `next build` | Succeeds, no warnings |
 
-Not yet run against the hosted Supabase project: its migrations still need to be applied (see "Configuration required").
+Hosted Supabase project `bquiwujcuynajxrxequh`: all 12 migrations applied via the SQL editor. A read-only check (public anon key) confirmed every table and column, the reference data (13 categories, 44 skills), all four storage buckets, public search functions working, and payment/admin/outbox functions refusing anonymous callers. The app was run against it and the public pages loaded with the real categories, correct empty states and real 404s. No accounts or data were created there.
 
 ## Phase 0 — Inspection and plan
 - [x] Repository inspected (empty); stack chosen: Next.js 16 App Router, TypeScript strict, Tailwind v4, Radix, RHF + Zod, Supabase
@@ -102,7 +102,7 @@ Not yet run against the hosted Supabase project: its migrations still need to be
 
 ## Configuration required (outside the code)
 
-1. Apply migrations to the hosted project `bquiwujcuynajxrxequh` (`npx supabase link` + `npx supabase db push`).
+1. ~~Apply migrations to the hosted project~~ Done (SQL editor). Run new migration files the same way, or run `supabase migration repair` once before switching to `supabase db push` (see DEPLOYMENT.md).
 2. Set environment variables in hosting: `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and server-only `SUPABASE_SERVICE_ROLE_KEY`.
 3. Configure Supabase Auth: Site URL, redirect URL `/auth/callback`, custom SMTP, optionally token-hash email templates.
 4. Grant the first admin with SQL.

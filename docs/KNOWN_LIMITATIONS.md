@@ -6,7 +6,7 @@ What the MVP deliberately does not do yet, and what has to be configured outside
 
 | Dependency | Needed for | Without it | How |
 | --- | --- | --- | --- |
-| Migrations applied to the hosted Supabase project | Everything | The deployed app has no tables | [DEPLOYMENT.md](DEPLOYMENT.md) §1 |
+| Migrations applied to the hosted Supabase project | Everything | Done for `bquiwujcuynajxrxequh` (SQL editor); future migration files must be applied too | [DEPLOYMENT.md](DEPLOYMENT.md) §1 |
 | `SUPABASE_SERVICE_ROLE_KEY` (server only) | Payments, refunds, webhooks, email dispatch | Checkout says payments aren't available; emails aren't sent | Hosting secret settings — never in chat or code |
 | Razorpay account, KYC, API keys, webhook secret | Real payments and refunds | Use `PAYMENT_PROVIDER=dev` (test mode, clearly labelled) or leave payments disabled | [PAYMENTS.md](PAYMENTS.md) |
 | Custom SMTP in Supabase Auth | Reliable sign-up confirmation and password-reset emails | Supabase's built-in sender is rate-limited and for testing only | Supabase → Authentication → SMTP |
