@@ -50,6 +50,18 @@ export const EMAIL_WORTHY_TYPES = new Set([
 ]);
 
 /**
+ * Addresses that can never receive mail: the reserved .test/.example/
+ * .invalid/.localhost TLDs and example.com/.net/.org (RFC 2606 / 6761).
+ * Sample accounts use these, and sending to them would only produce bounces
+ * that hurt the sender's reputation.
+ */
+export function isUndeliverableEmail(email: string): boolean {
+  const domain = email.trim().toLowerCase().split("@").pop() ?? "";
+  if (/\.(test|example|invalid|localhost)$/.test(domain)) return true;
+  return /^(.+\.)?example\.(com|net|org)$/.test(domain);
+}
+
+/**
  * WhatsApp is intentionally not connected in the MVP. Implement `send` with
  * the WhatsApp Business Platform once a provider and approved templates
  * exist, and respect user_settings.whatsapp_opt_in.

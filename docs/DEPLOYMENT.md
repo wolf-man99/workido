@@ -28,6 +28,18 @@ From then on, `npx supabase db push` applies only new files. If you keep using t
 
 Migrations include the initial categories and skills. They do **not** include sample data. Do not run `npm run seed:dev` against production.
 
+### Temporary sample data (optional, before launch)
+
+To try both sides of the marketplace on the hosted project without a service-role key, use the SQL scripts in `supabase/sample-data/`:
+
+1. Open `seed-sample-data.sql`, replace `CHANGE-ME-BEFORE-RUNNING` with a password of 10+ characters, paste the file into the SQL Editor and run it. It refuses to run twice and is all-or-nothing.
+2. Log in as `test-buyer@sample.workido.test` (buyer) or `test-specialist@sample.workido.test` (specialist) with that password. Use two browsers or a private window to act as both at once.
+3. When you're done, run `remove-sample-data.sql`. It deletes every sample account and everything attached to it, including orders a real account placed with a sample specialist, and recalculates the ratings of any real specialist who worked with sample buyers. It reports (but can't delete) files uploaded during testing; delete those in Storage.
+
+What's seeded: the two test accounts, six sample specialists with published services, two sample buyers, orders between the test accounts waiting on each side (paid → accept, in progress → deliver, submitted → approve or request revision, completed → review and hire again), completed orders with sample reviews, an open requirement with two offers to compare, and an invitation waiting for the test specialist's offer. Every sample profile shows a "Sample profile" badge, payments are recorded as test mode, and the emails use the reserved `.test` domain, which the email dispatcher never sends to.
+
+Accepting an offer or buying a gig creates an order that needs payment. That only works once a payment provider is configured: `PAYMENT_PROVIDER=dev` with `ALLOW_DEV_PAYMENTS=true` and `SUPABASE_SERVICE_ROLE_KEY` for test mode (see [PAYMENTS.md](PAYMENTS.md)).
+
 ### Auth settings (Supabase → Authentication)
 
 - **Site URL:** your production URL, e.g. `https://workido.example.com`.
@@ -94,5 +106,5 @@ Follow [PAYMENTS.md](PAYMENTS.md). Until Razorpay is approved and configured, ei
 - [ ] Terms of Service and Privacy Policy replaced with lawyer-reviewed versions (`/terms`, `/privacy`).
 - [ ] `NEXT_PUBLIC_SUPPORT_EMAIL` set; social links only if real.
 - [ ] Email dispatch scheduled with `CRON_SECRET`.
-- [ ] No sample data in production (`select count(*) from profiles where is_sample` returns 0).
+- [ ] No sample data in production: run `supabase/sample-data/remove-sample-data.sql`, then `select count(*) from profiles where is_sample` returns 0.
 - [ ] Error monitoring and log retention configured in your host.

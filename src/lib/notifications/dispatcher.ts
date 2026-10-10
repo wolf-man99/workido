@@ -1,7 +1,7 @@
 import "server-only";
 import { getPublicEnv } from "@/lib/config/public-env";
 import { createSupabaseServiceClient } from "@/lib/supabase/admin";
-import { EMAIL_WORTHY_TYPES } from "./channels";
+import { EMAIL_WORTHY_TYPES, isUndeliverableEmail } from "./channels";
 import { createEmailChannel } from "./email";
 
 export interface DispatchSummary {
@@ -28,7 +28,8 @@ export async function dispatchNotificationEmails(limit = 50): Promise<DispatchSu
 
   for (const item of outbox ?? []) {
     summary.examined++;
-    const shouldSend = channel.isEnabled() && item.email_enabled && EMAIL_WORTHY_TYPES.has(item.type);
+    const shouldSend =
+      channel.isEnabled() && item.email_enabled && EMAIL_WORTHY_TYPES.has(item.type) && !isUndeliverableEmail(item.email);
     try {
       if (shouldSend) {
         await channel.send(

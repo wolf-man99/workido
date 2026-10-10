@@ -78,6 +78,7 @@ src/
     validation/        Zod schemas shared by client and server
 supabase/
   migrations/          Schema, RLS, functions, storage, reference data
+  sample-data/         Temporary sample data for a hosted project (SQL Editor) and its removal script
 scripts/seed-dev.ts    Development seed
 tests/                 unit/, integration/, e2e/
 ```
