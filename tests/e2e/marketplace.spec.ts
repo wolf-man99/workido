@@ -5,7 +5,8 @@ import { PNG, expectToast, logIn, logOut, signUp, uniqueEmail } from "./helpers"
  * Critical journeys, run in order with shared accounts:
  *  2. A specialist creates a profile and publishes a service.
  *  1. A buyer registers and publishes a requirement.
- *  3. A buyer browses and purchases a predefined service.
+ *  3. A buyer browses a predefined service, talks to the specialist in the
+ *     pre-order chat, then orders it from the chat and pays.
  *  5/6. The specialist delivers, the buyer requests a revision, then approves.
  *  7. The completed order accepts exactly one review.
  *  8. The buyer starts a repeat hire.
@@ -101,10 +102,33 @@ test("buyer registers and publishes a requirement", async ({ page }) => {
   await expect(card.getByText("Offers services in Graphic Design")).toBeVisible();
 });
 
-test("buyer purchases a gig, specialist delivers, buyer requests a revision and approves", async ({ page }) => {
+test("buyer chats before ordering, then purchases the gig; specialist delivers, buyer requests a revision and approves", async ({ page }) => {
   await asBuyer(page);
   await page.goto(`/gigs?q=${encodeURIComponent(serviceTitle)}`);
   await page.getByRole("link", { name: serviceTitle }).click();
+
+  // Talk first: nothing is paid to start a conversation.
+  await page.getByRole("button", { name: "Contact Sana" }).click();
+  await page.waitForURL("**/dashboard/messages/**");
+  const enquiryUrl = page.url();
+  await expect(page.getByText("Before ordering")).toBeVisible();
+  await page.getByRole("textbox", { name: "Message" }).fill("Hi Sana! Can you do a Diwali carousel in our brand colours by Friday?");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByText("Can you do a Diwali carousel")).toBeVisible();
+
+  await asSpecialist(page);
+  await page.goto("/dashboard/messages");
+  await page.getByRole("link", { name: new RegExp(buyer.name) }).click();
+  await expect(page.getByText("Can you do a Diwali carousel")).toBeVisible();
+  await page.getByRole("textbox", { name: "Message" }).fill("Yes, happy to. Order the gig and share your brand kit in the order chat.");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByText("happy to. Order the gig")).toBeVisible();
+
+  // Then order from the chat and pay on Workido.
+  await asBuyer(page);
+  await page.goto(enquiryUrl);
+  await expect(page.getByText("happy to. Order the gig")).toBeVisible();
+  await page.getByRole("button", { name: "Order this gig" }).click();
   await page.getByLabel("Your requirements").fill("Diwali sale carousel. Brand colours: orange and ink. Copy attached in chat.");
   await page.getByRole("button", { name: "Continue to payment" }).click();
   await page.waitForURL("**/checkout");

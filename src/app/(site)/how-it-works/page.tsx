@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 };
 
 const buyerSteps = [
-  { icon: ShoppingBag, title: "Buy a ready-made gig", body: "Know what you need? Pick a gig with a fixed price, clear deliverables and a delivery time. Add your requirements and pay." },
+  { icon: ShoppingBag, title: "Find a gig, talk first", body: "Pick a gig with a fixed price, clear deliverables and a delivery time, then message the specialist to agree the details. Chatting is free." },
   { icon: ClipboardList, title: "Or post a custom task", body: "Describe the work, set a budget and deadline. We build a short, relevant shortlist and explain why each person fits." },
   { icon: Sparkles, title: "Invite and compare", body: "Invite the specialists you like. They send one offer each — price, timeline and revisions — so you compare like for like. No bidding wars." },
-  { icon: CreditCard, title: "Pay securely", body: "Accept an offer and pay through our payment provider. Work starts when the specialist accepts the paid order." },
+  { icon: CreditCard, title: "Pay securely on Workido", body: "Order the gig or accept an offer, then pay through our payment provider. Work starts when the specialist accepts the paid order." },
   { icon: FileCheck2, title: "Review and approve", body: "Get deliverables in one place. Request a revision within the agreed policy, or approve to complete the order." },
   { icon: Repeat, title: "Hire again", body: "Found someone great? Rehire them for your next task in a couple of clicks." },
 ];
@@ -21,7 +21,7 @@ const buyerSteps = [
 const specialistSteps = [
   { icon: UserRoundCheck, title: "Build your profile", body: "Add your skills, experience and portfolio. Publish when it's ready." },
   { icon: Store, title: "Publish services", body: "Package what you do best with a clear scope, honest delivery time and fixed price." },
-  { icon: Sparkles, title: "Get invited", body: "Matching considers skills, category, availability, delivery time, budget and portfolio evidence. Keep your availability accurate." },
+  { icon: Sparkles, title: "Answer buyers and get invited", body: "Buyers message you about your gigs before ordering. Matching also invites you to custom tasks based on skills, category, availability, delivery time, budget and portfolio." },
   { icon: MessageSquare, title: "Deliver great work", body: "Accept paid orders, chat with the buyer, upload deliverables and handle revisions." },
 ];
 

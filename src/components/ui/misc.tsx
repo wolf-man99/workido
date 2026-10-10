@@ -56,7 +56,7 @@ export function RatingSummary({
 
 export function StarRow({ rating, className }: { rating: number; className?: string }) {
   return (
-    <span className={cn("inline-flex gap-0.5", className)} aria-label={`${rating} out of 5 stars`}>
+    <span role="img" className={cn("inline-flex gap-0.5", className)} aria-label={`${rating} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((value) => (
         <Star key={value} aria-hidden className={cn("size-4", value <= rating ? "fill-sun text-sun" : "text-ink/20")} />
       ))}

@@ -131,21 +131,39 @@ isOneToOne: false
                   ]
                 },"conversations": {
                   Row: {
-                    "created_at": string,"id": string,"last_message_at": string | null,"order_id": string
+                    "buyer_id": string | null,"created_at": string,"id": string,"kind": string,"last_message_at": string | null,"order_id": string | null,"service_id": string | null,"specialist_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"id"?: string,"last_message_at"?: string | null,"order_id": string
+                    "buyer_id"?: string | null,"created_at"?: string,"id"?: string,"kind"?: string,"last_message_at"?: string | null,"order_id"?: string | null,"service_id"?: string | null,"specialist_id"?: string | null
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"last_message_at"?: string | null,"order_id"?: string
+                    "buyer_id"?: string | null,"created_at"?: string,"id"?: string,"kind"?: string,"last_message_at"?: string | null,"order_id"?: string | null,"service_id"?: string | null,"specialist_id"?: string | null
                   }
                   Relationships: [
                     {
+      foreignKeyName: "conversations_buyer_id_fkey"
+      columns: ["buyer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "conversations_order_id_fkey"
       columns: ["order_id"]
 isOneToOne: true
       referencedRelation: "orders"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conversations_service_id_fkey"
+      columns: ["service_id"]
+isOneToOne: false
+      referencedRelation: "services"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conversations_specialist_id_fkey"
+      columns: ["specialist_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
       referencedColumns: ["id"]
     }
                   ]
@@ -1102,7 +1120,7 @@ isOneToOne: false
                            },
 "list_my_conversations":
 { Args: Record<PropertyKey, never>; Returns: {
-              "conversation_id": string,"counterpart_avatar": string,"counterpart_id": string,"counterpart_name": string,"counterpart_username": string,"last_message_at": string,"last_message_body": string,"last_message_type": Database["public"]['Enums']["message_type"],"last_sender_id": string,"order_id": string,"order_number": string,"order_status": Database["public"]['Enums']["order_status"],"order_title": string,"unread_count": number
+              "conversation_id": string,"counterpart_avatar": string,"counterpart_id": string,"counterpart_name": string,"counterpart_username": string,"kind": string,"last_message_at": string,"last_message_body": string,"last_message_type": Database["public"]['Enums']["message_type"],"last_sender_id": string,"order_id": string,"order_number": string,"order_status": Database["public"]['Enums']["order_status"],"order_title": string,"service_title": string,"unread_count": number
             }[]
                            },
 "mark_conversation_read":
@@ -1193,6 +1211,9 @@ isOneToOne: false
                            },
 "slugify":
 { Args: { "value": string }; Returns: string
+                           },
+"start_enquiry":
+{ Args: { "p_service_id"?: string,"p_specialist_id": string }; Returns: string
                            },
 "submit_verification_request":
 { Args: { "p_note"?: string }; Returns: string

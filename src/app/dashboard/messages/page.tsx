@@ -18,9 +18,9 @@ export default async function MessagesPage() {
 
   return (
     <>
-      <PageHeader title="Messages" description="Every conversation belongs to an order, so context is never lost." />
+      <PageHeader title="Messages" description="Talk to specialists before you order, and keep each order's conversation in one place." />
       {!conversations || conversations.length === 0 ? (
-        <EmptyState icon={MessageSquare} title="No conversations yet" description="A conversation opens automatically when an order is created." />
+        <EmptyState icon={MessageSquare} title="No conversations yet" description="Contact a specialist from any gig or profile to ask questions before ordering. Each order also gets its own chat." />
       ) : (
         <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-[var(--radius-card)] border border-border bg-card">
           {conversations.map((conversation) => {
@@ -38,7 +38,9 @@ export default async function MessagesPage() {
                       <p className={cn("truncate", unread ? "font-bold" : "font-semibold")}>{conversation.counterpart_name}</p>
                       {conversation.last_message_at ? <span className="shrink-0 text-xs text-muted-foreground">{formatRelativeTime(conversation.last_message_at)}</span> : null}
                     </div>
-                    <p className="truncate text-xs text-muted-foreground">{conversation.order_title}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {conversation.kind === "enquiry" ? `Before ordering${conversation.service_title ? ` · ${conversation.service_title}` : ""}` : conversation.order_title}
+                    </p>
                     <p className={cn("truncate text-sm", unread ? "font-semibold text-ink" : "text-ink-soft")}>
                       {conversation.last_sender_id === user.id ? "You: " : ""}
                       {preview}

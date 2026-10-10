@@ -42,7 +42,7 @@ const steps = [
   {
     icon: Handshake,
     title: "Connect with the right specialist",
-    body: "See a short, relevant shortlist with clear reasons for each match. Agree scope and price up front.",
+    body: "Message specialists about their gigs, or get a short, relevant shortlist for a custom task. Agree scope and price before you pay.",
   },
   {
     icon: FileCheck2,

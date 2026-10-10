@@ -3,7 +3,7 @@ import { Container } from "@/components/ui/misc";
 
 export default function GigsLoading() {
   return (
-    <Container className="flex flex-col gap-8 py-10" aria-busy="true" aria-label="Loading gigs">
+    <Container role="status" className="flex flex-col gap-8 py-10" aria-busy="true" aria-label="Loading gigs">
       <Skeleton className="h-10 w-56" />
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <Skeleton className="hidden h-96 lg:block" />

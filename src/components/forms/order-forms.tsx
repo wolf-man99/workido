@@ -53,6 +53,17 @@ export function ServiceOrderForm({ serviceId, instructions }: { serviceId: strin
   );
 }
 
+/** "Order now" for buyers who don't need to talk first; reveals the order form. */
+export function OrderNowPanel({ serviceId, instructions, label = "Order now" }: { serviceId: string; instructions: string | null; label?: string }) {
+  const [open, setOpen] = useState(false);
+  if (open) return <ServiceOrderForm serviceId={serviceId} instructions={instructions} />;
+  return (
+    <Button variant="outline" size="lg" onClick={() => setOpen(true)}>
+      {label}
+    </Button>
+  );
+}
+
 export function SaveSpecialistButton({ specialistId, initiallySaved }: { specialistId: string; initiallySaved: boolean }) {
   const [saved, setSaved] = useState(initiallySaved);
   const [pending, startTransition] = useTransition();

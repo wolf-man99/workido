@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SaveSpecialistButton } from "@/components/forms/order-forms";
+import { ContactSpecialistButton } from "@/components/messages/contact-specialist-button";
 import { ServiceCard } from "@/components/marketplace/cards";
 import { ReviewList } from "@/components/marketplace/reviews";
 import { Avatar } from "@/components/ui/avatar";
@@ -101,6 +102,13 @@ export default async function SpecialistProfilePage(props: PageProps<"/specialis
                   <Link href={`/dashboard/buyer/requirements/new?invite=${profile.username}`}>Invite to a task</Link>
                 </Button>
               ) : null}
+              {user ? (
+                <ContactSpecialistButton specialistId={profile.id} label="Message" variant={hasWorkedTogether || specialist.availability_status !== "unavailable" ? "outline" : "primary"} />
+              ) : (
+                <Button asChild variant="outline">
+                  <Link href={`/login?next=${encodeURIComponent(`/specialists/${profile.username}`)}`}>Log in to message</Link>
+                </Button>
+              )}
               {user ? <SaveSpecialistButton specialistId={profile.id} initiallySaved={saved} /> : null}
             </div>
           ) : (

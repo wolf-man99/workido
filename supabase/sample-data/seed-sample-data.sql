@@ -11,7 +11,10 @@
 --   * six sample specialists with published services, two sample buyers
 --   * orders between the two test accounts waiting on each side
 --     (paid, in progress, submitted, completed), completed orders with
---     sample reviews, an open requirement with two offers, and an invitation
+--     sample reviews, an open requirement with two offers, an invitation,
+--     and pre-order chats (one answered, one waiting for the specialist)
+--
+-- Requires every migration up to 20261010000300_enquiries.sql.
 --
 -- How to run:
 --   1. Replace CHANGE-ME-BEFORE-RUNNING below with a password (10+ characters).
@@ -369,6 +372,30 @@ begin
   insert into public.requirement_skills (requirement_id, skill_id, is_mandatory)
     select v_requirement, id, false from public.skills where slug in ('brand-identity', 'social-media-creatives');
   insert into public.requirement_invitations (requirement_id, specialist_id) values (v_requirement, (v_ids ->> 'ts')::uuid);
+
+  -- 5. Pre-order chats (after the orders, so they start clean) -----------------
+  -- Test Buyer asking Test Specialist about a gig, with a reply.
+  v_buyer := (v_ids ->> 'tb')::uuid;
+  v_specialist := (v_ids ->> 'ts')::uuid;
+  perform set_config('request.jwt.claims', jsonb_build_object('sub', v_buyer, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claim.sub', v_buyer::text, true);
+  v_conversation := public.start_enquiry(v_specialist,
+    (select id from public.services where specialist_id = v_specialist and title = 'Instagram post design (set of 3)'));
+  insert into public.messages (conversation_id, sender_id, body)
+    values (v_conversation, v_buyer, 'Sample message: hi! Could you also make story-sized versions of the posts?');
+  perform set_config('request.jwt.claims', jsonb_build_object('sub', v_specialist, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claim.sub', v_specialist::text, true);
+  insert into public.messages (conversation_id, sender_id, body)
+    values (v_conversation, v_specialist, 'Sample message: yes, I can add 9:16 versions. Order the gig and mention it in your requirements.');
+
+  -- Nisha asking Test Specialist about the brand kit, waiting for a reply.
+  v_buyer := (v_ids ->> 'nisha')::uuid;
+  perform set_config('request.jwt.claims', jsonb_build_object('sub', v_buyer, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claim.sub', v_buyer::text, true);
+  v_conversation := public.start_enquiry(v_specialist,
+    (select id from public.services where specialist_id = v_specialist and title = 'Simple brand kit: logo refresh, colours and fonts'));
+  insert into public.messages (conversation_id, sender_id, body)
+    values (v_conversation, v_buyer, 'Sample message: hello! Do you work with hand-drawn logos? Ours is a sketch for a small bakery.');
 
   -- Test Buyer has saved one specialist.
   insert into public.saved_specialists (buyer_id, specialist_id) values ((v_ids ->> 'tb')::uuid, (v_ids ->> 'kavya')::uuid);

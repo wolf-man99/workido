@@ -2,7 +2,8 @@ import { CalendarClock, Check, Clock, ExternalLink, Repeat } from "lucide-react"
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SaveSpecialistButton, ServiceOrderForm, UnavailableNotice } from "@/components/forms/order-forms";
+import { OrderNowPanel, SaveSpecialistButton, UnavailableNotice } from "@/components/forms/order-forms";
+import { ContactSpecialistButton } from "@/components/messages/contact-specialist-button";
 import { ReviewList } from "@/components/marketplace/reviews";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -26,8 +27,10 @@ export default async function GigDetailPage(props: PageProps<"/gigs/[slug]">) {
   const [data, user] = await Promise.all([getServiceBySlug(slug), getCurrentUser()]);
   if (!data) notFound();
   const { service, specialistProfile, specialist, portfolio, reviews } = data;
+  const firstName = specialistProfile.full_name.split(/\s+/)[0] || "the specialist";
   const isOwner = user?.id === service.specialist_id;
   const isPublished = service.publication_status === "published" && specialist.is_published;
+  const showMobileBar = !isOwner && isPublished;
   const saved = user && !isOwner ? await isSpecialistSaved(user.id, service.specialist_id) : false;
 
   return (
@@ -134,14 +137,19 @@ export default async function GigDetailPage(props: PageProps<"/gigs/[slug]">) {
               </Button>
             ) : !isPublished ? (
               <p className="text-sm text-muted-foreground">This gig isn&apos;t available right now.</p>
-            ) : specialist.availability_status === "unavailable" ? (
-              <UnavailableNotice />
             ) : user ? (
-              <ServiceOrderForm serviceId={service.id} instructions={service.buyer_instructions} />
+              <div className="flex flex-col gap-3">
+                {specialist.availability_status === "unavailable" ? <UnavailableNotice /> : null}
+                <ContactSpecialistButton specialistId={service.specialist_id} serviceId={service.id} label={`Contact ${firstName}`} size="lg" />
+                <p className="text-xs text-muted-foreground">Ask questions and agree the details first. You only pay when you place the order.</p>
+                {specialist.availability_status !== "unavailable" ? (
+                  <OrderNowPanel serviceId={service.id} instructions={service.buyer_instructions} label="Ready to go? Order now" />
+                ) : null}
+              </div>
             ) : (
               <div className="flex flex-col gap-2">
                 <Button asChild size="lg">
-                  <Link href={`/login?next=${encodeURIComponent(`/gigs/${service.slug}`)}`}>Log in to order</Link>
+                  <Link href={`/login?next=${encodeURIComponent(`/gigs/${service.slug}`)}`}>Log in to contact {firstName}</Link>
                 </Button>
                 <Button asChild variant="ghost">
                   <Link href="/signup">New here? Create an account</Link>
@@ -160,6 +168,25 @@ export default async function GigDetailPage(props: PageProps<"/gigs/[slug]">) {
           </div>
         </aside>
       </div>
+
+      {/* On small screens the order panel sits below the reviews; keep the main action in reach. */}
+      {showMobileBar ? (
+        <div className="sticky bottom-0 z-30 -mx-4 -mb-8 mt-8 border-t border-border bg-card/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mb-10 sm:px-6 lg:hidden">
+          <div className="flex items-center gap-3">
+            <div className="shrink-0">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Fixed price</p>
+              <p className="font-display text-lg font-bold leading-tight">{formatMoney(service.price_minor, service.currency)}</p>
+            </div>
+            {user ? (
+              <ContactSpecialistButton specialistId={service.specialist_id} serviceId={service.id} label={`Contact ${firstName}`} className="flex-1" />
+            ) : (
+              <Button asChild className="flex-1">
+                <Link href={`/login?next=${encodeURIComponent(`/gigs/${service.slug}`)}`}>Log in to contact {firstName}</Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      ) : null}
     </Container>
   );
 }

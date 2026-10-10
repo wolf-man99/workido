@@ -79,6 +79,9 @@ Unit `payments.test.ts`: Razorpay checkout signature verification, webhook signa
 ### Messaging and files
 Integration `messaging-files`: participants only, no sender spoofing or system messages, notifications, private order files, deliverable upload rules, bucket MIME restrictions, own avatar folder only. Unit `file-validation`: magic-byte sniffing, extension/MIME/size rules, safe file names. E2e `access-control.spec.ts`: signed download URL refused for non-participants.
 
+### Pre-order chat
+Integration `enquiries`: one chat per buyer and specialist, no self-messaging or unpublished specialists or other people's gigs, hidden from the specialist until the buyer writes, participants only, notifications name the gig, text only, order note without a notification, daily limit, removed with a deleted account. E2e `marketplace.spec.ts` (journey 3).
+
 ### Reviews
 Integration `order-lifecycle` (participants of completed orders only, once each, not before completion); e2e `marketplace.spec.ts` (one review per order, then "Hire again").
 
@@ -87,7 +90,7 @@ Integration `order-lifecycle` (participants of completed orders only, once each,
 | --- | --- | --- |
 | 1 | Buyer registers and publishes a requirement | `marketplace.spec.ts` |
 | 2 | Specialist creates a profile and publishes a service | `marketplace.spec.ts` |
-| 3 | Buyer browses and purchases a predefined service | `marketplace.spec.ts` |
+| 3 | Buyer browses a predefined service, chats with the specialist first, then orders it from the chat and pays | `marketplace.spec.ts` |
 | 4 | Buyer posts a custom requirement and selects an offer | `marketplace.spec.ts` |
 | 5 | Specialist submits deliverables, buyer approves | `marketplace.spec.ts` |
 | 6 | Buyer requests a revision | `marketplace.spec.ts` |

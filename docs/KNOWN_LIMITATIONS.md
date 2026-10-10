@@ -32,6 +32,12 @@ What the MVP deliberately does not do yet, and what has to be configured outside
 - **Order changes after creation** (scope or price amendments, tips, extensions) are not supported; a new order is required.
 - **Dispute evidence** is the dispute description plus the order's messages and files; there is no separate evidence upload or appeal flow.
 
+## Pre-order chat
+
+- **Text only.** Files can be shared once an order exists (they're stored with the order).
+- **No custom quotes in the chat yet.** After talking, the buyer orders the gig at its listed price, or posts a custom task and invites the specialist for a tailored offer.
+- **Only buyers start chats**, at most 20 new specialists a day, to keep specialists' inboxes free of cold outreach.
+
 ## Matching and discovery
 
 - **Rules-based matching only** (documented in [MATCHING.md](MATCHING.md)); weights are code constants, not admin-configurable. Matching runs when a requirement is posted or edited, or on demand — not when new specialists join later.

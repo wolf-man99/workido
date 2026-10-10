@@ -17,9 +17,9 @@ function fileHref(path: string, name: string) {
 }
 
 /**
- * Order chat. New messages arrive through Supabase Realtime (which enforces
- * RLS); if realtime is unavailable the thread falls back to polling, so
- * messaging keeps working either way.
+ * Order chat or pre-order enquiry (orderId null: text only). New messages
+ * arrive through Supabase Realtime (which enforces RLS); if realtime is
+ * unavailable the thread falls back to polling, so messaging keeps working.
  */
 export function ChatThread({
   conversationId,
@@ -28,13 +28,15 @@ export function ChatThread({
   names,
   initialMessages,
   canSend,
+  emptyText = "No messages yet. Say hello and share anything the other person needs.",
 }: {
   conversationId: string;
-  orderId: string;
+  orderId: string | null;
   currentUserId: string;
   names: Record<string, string>;
   initialMessages: ChatMessage[];
   canSend: boolean;
+  emptyText?: string;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [body, setBody] = useState("");
@@ -104,10 +106,17 @@ export function ChatThread({
     <div className="flex min-h-[60vh] flex-col overflow-hidden rounded-3xl border border-border bg-card">
       <div className="flex-1 overflow-y-auto p-4 sm:p-5" aria-live="polite" aria-label="Messages">
         {messages.length === 0 ? (
-          <p className="py-10 text-center text-sm text-muted-foreground">No messages yet. Say hello and share anything the other person needs.</p>
+          <p className="py-10 text-center text-sm text-muted-foreground">{emptyText}</p>
         ) : (
           <ol className="flex flex-col gap-3">
             {messages.map((message) => {
+              if (message.message_type === "system") {
+                return (
+                  <li key={message.id} className="mx-auto max-w-[90%] rounded-2xl bg-sun-soft px-4 py-2 text-center text-xs text-ink-soft">
+                    {message.body} <span className="text-muted-foreground">· {formatDateTime(message.created_at)}</span>
+                  </li>
+                );
+              }
               const mine = message.sender_id === currentUserId;
               return (
                 <li key={message.id} className={cn("group flex flex-col gap-1", mine ? "items-end" : "items-start")}>
@@ -136,7 +145,7 @@ export function ChatThread({
 
       {canSend ? (
         <div className="border-t border-border p-3 sm:p-4">
-          {showUpload ? (
+          {showUpload && orderId ? (
             <div className="mb-3">
               <FileUpload
                 purpose="message"
@@ -160,9 +169,11 @@ export function ChatThread({
               send();
             }}
           >
-            <Button type="button" variant="ghost" size="icon" aria-label="Attach a file" aria-pressed={showUpload} onClick={() => setShowUpload((value) => !value)}>
-              <Paperclip className="size-5" />
-            </Button>
+            {orderId ? (
+              <Button type="button" variant="ghost" size="icon" aria-label="Attach a file" aria-pressed={showUpload} onClick={() => setShowUpload((value) => !value)}>
+                <Paperclip className="size-5" />
+              </Button>
+            ) : null}
             <Textarea
               aria-label="Message"
               rows={1}
@@ -183,7 +194,8 @@ export function ChatThread({
             </Button>
           </form>
           <p className="mt-2 text-[11px] text-muted-foreground">
-            Keep communication and payments on Workido. Never share passwords or pay outside the platform. {live ? "" : "(Updates every few seconds)"}
+            {orderId ? "" : "Files can be shared once an order is placed. "}Keep communication and payments on Workido. Never share passwords or pay outside the
+            platform. {live ? "" : "(Updates every few seconds)"}
           </p>
         </div>
       ) : (
