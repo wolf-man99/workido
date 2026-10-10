@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { accountStatusTone } from "@/components/admin/account-status";
 import { ReasonAction } from "@/components/admin/admin-forms";
 import { OrderStatusBadge } from "@/components/orders/order-list";
 import { Avatar } from "@/components/ui/avatar";
@@ -48,7 +49,7 @@ export default async function AdminUserPage(props: PageProps<"/admin/users/[id]"
         title={profile.full_name}
         description={`@${profile.username} · joined ${formatDate(profile.created_at)}`}
         actions={
-          isSelf ? null : profile.account_status === "active" ? (
+          isSelf || profile.account_status === "deleted" ? null : profile.account_status === "active" ? (
             <ReasonAction
               variant="danger"
               label="Suspend account"
@@ -86,7 +87,7 @@ export default async function AdminUserPage(props: PageProps<"/admin/users/[id]"
                       {role}
                     </Badge>
                   ))}
-                  <Badge tone={profile.account_status === "active" ? "success" : "danger"} className="capitalize">
+                  <Badge tone={accountStatusTone(profile.account_status)} className="capitalize">
                     {profile.account_status}
                   </Badge>
                   {profile.is_sample ? <Badge tone="outline">Sample data</Badge> : null}

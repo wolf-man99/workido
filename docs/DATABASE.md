@@ -18,6 +18,8 @@ PostgreSQL on Supabase. All schema lives in `supabase/migrations/` (applied in f
 | `…001000_api_grants.sql` | Restricts which functions anonymous visitors may execute |
 | `…001100_messaging_outbox_contact.sql` | Inbox RPC, email outbox, `contact_messages` |
 | `…001200_requirement_match_timestamp.sql` | `requirements.matches_computed_at` |
+| `…20261010000100_account_status_deleted.sql` | `deleted` value for `account_status` (separate file: a new enum value can't be used in the transaction that adds it) |
+| `…20261010000200_account_deletion.sql` | `account_deletion_blocker`, `delete_my_account`, deleted profiles readable as "Deleted user", admins can't revive deleted accounts |
 
 **Applying migrations**
 
@@ -81,10 +83,11 @@ notifications, saved_specialists, reports, analytics_events, contact_messages, a
 | `search_services`, `search_specialists` | anyone | Discovery with filters and pagination (RLS applies) |
 | `get_specialist_reputation(specialist)` | anyone | Aggregates only |
 | `admin_*` | admin | Metrics, user search/suspension, verification, moderation, reports, payouts |
+| `account_deletion_blocker()` / `delete_my_account(confirmation)` | signed-in user | Self-service deletion. Blocked while orders are in progress, disputed or a payout is owed. Without order history the auth user is deleted (everything cascades); with history the account is anonymised ("Deleted user", login and personal data removed, email freed) so the other party keeps the order, messages and reviews. Unpaid orders are cancelled. |
 
 ## RLS summary
 
-- Public read: active categories/skills, active profiles, published specialist profiles and their skills/portfolio/services, reviews, platform settings.
+- Public read: active categories/skills, active and deleted (anonymised) profiles, published specialist profiles and their skills/portfolio/services, reviews, platform settings.
 - Owner only: user settings, requirements (plus invited specialists), requirement matches, saved specialists, notifications.
 - Participants only: orders and everything attached (events, submissions, deliverables — drafts only for the specialist — disputes, conversations, messages, payments for the buyer).
 - Admins: read everything needed for moderation; writes through audited functions.

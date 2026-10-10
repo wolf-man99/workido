@@ -3,6 +3,12 @@ import { StarRow } from "@/components/ui/misc";
 import { formatDate } from "@/lib/format";
 import { shortName } from "@/lib/utils";
 
+/** First name and initial; accounts deleted by their owner read "Deleted user" in full. */
+function reviewerName(reviewer: { full_name: string } | null) {
+  if (!reviewer) return "Buyer";
+  return reviewer.full_name === "Deleted user" ? reviewer.full_name : shortName(reviewer.full_name);
+}
+
 export interface ReviewView {
   id: string;
   rating: number;
@@ -27,7 +33,7 @@ export function ReviewList({ reviews, emptyText = "No reviews yet. Reviews appea
           <div className="flex flex-wrap items-center justify-between gap-2">
             <StarRow rating={review.rating} />
             <span className="text-xs text-muted-foreground">
-              {review.reviewer ? shortName(review.reviewer.full_name) : "Buyer"} · {formatDate(review.created_at)} · Verified order
+              {reviewerName(review.reviewer)} · {formatDate(review.created_at)} · Verified order
             </span>
           </div>
           {review.comment ? <p className="mt-2 text-sm leading-relaxed text-ink-soft">{review.comment}</p> : null}

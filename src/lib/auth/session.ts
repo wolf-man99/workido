@@ -34,7 +34,9 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     supabase.from("profiles").select("id, username, full_name, avatar_path, account_status").eq("id", userId).maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", userId),
   ]);
-  if (!profile) return null;
+  // A deleted account's old access token can outlive its session for up to
+  // an hour; treat it as signed out.
+  if (!profile || profile.account_status === "deleted") return null;
 
   const roles = (roleRows ?? []).map((row) => row.role);
   const email = typeof data.claims.email === "string" ? data.claims.email : null;

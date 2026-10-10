@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DeleteAccount } from "@/components/forms/delete-account";
 import { AvatarForm, PreferencesForm, ProfileForm } from "@/components/forms/settings-forms";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,9 +15,10 @@ export const metadata: Metadata = { title: "Account settings" };
 export default async function SettingsPage() {
   const user = await requireUser("/dashboard/settings");
   const supabase = await createSupabaseServerClient();
-  const [{ data: profile }, { data: settings }] = await Promise.all([
+  const [{ data: profile }, { data: settings }, { data: deletionBlocker }] = await Promise.all([
     supabase.from("profiles").select("full_name, username, bio, city, region, country_code, website_url").eq("id", user.id).single(),
     supabase.from("user_settings").select("email_notifications, marketing_emails, whatsapp_opt_in, phone").eq("user_id", user.id).single(),
+    supabase.rpc("account_deletion_blocker"),
   ]);
 
   return (
@@ -111,6 +113,16 @@ export default async function SettingsPage() {
           <Link href="/reset-password" className="text-sm font-semibold text-brand-text hover:underline">
             Change password
           </Link>
+        </CardContent>
+      </Card>
+
+      <Card className="border-danger/30">
+        <CardHeader>
+          <CardTitle>Delete account</CardTitle>
+          <CardDescription>Permanently delete your Workido account, whether you hire, work or both.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DeleteAccount blocker={deletionBlocker ?? null} />
         </CardContent>
       </Card>
     </>

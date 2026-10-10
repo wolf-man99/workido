@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { accountStatusTone } from "@/components/admin/account-status";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
@@ -18,7 +19,7 @@ export default async function AdminUsersPage(props: PageProps<"/admin/users">) {
   const params = await props.searchParams;
   const q = typeof params.q === "string" ? params.q.slice(0, 80) : "";
   const role = params.role === "buyer" || params.role === "specialist" || params.role === "admin" ? params.role : undefined;
-  const status = params.status === "active" || params.status === "suspended" ? params.status : undefined;
+  const status = params.status === "active" || params.status === "suspended" || params.status === "deleted" ? params.status : undefined;
   const page = Math.max(1, Number(params.page) || 1);
 
   const supabase = await createSupabaseServerClient();
@@ -47,6 +48,7 @@ export default async function AdminUsersPage(props: PageProps<"/admin/users">) {
           <option value="">Any status</option>
           <option value="active">Active</option>
           <option value="suspended">Suspended</option>
+          <option value="deleted">Deleted</option>
         </Select>
         <Button type="submit">Search</Button>
       </form>
@@ -85,7 +87,7 @@ export default async function AdminUsersPage(props: PageProps<"/admin/users">) {
                   </div>
                 </td>
                 <td className="p-3">
-                  <Badge tone={user.account_status === "active" ? "success" : "danger"} className="capitalize">
+                  <Badge tone={accountStatusTone(user.account_status)} className="capitalize">
                     {user.account_status}
                   </Badge>
                 </td>

@@ -38,6 +38,7 @@ Hosted Supabase project `bquiwujcuynajxrxequh`: all 12 migrations applied via th
 - [x] Profiles, settings, multi-role model (buyer, specialist, admin); admin never grantable at sign-up or by users
 - [x] Sign-up, login, logout, password recovery, email confirmation callback (PKCE and token-hash)
 - [x] Profile and account settings editing, avatar upload
+- [x] Self-service account deletion for buyers and specialists (typed confirmation "Delete my Workido account"; erased without order history, anonymised with it; blocked while orders or payouts are open)
 - [x] Development seed with clearly labelled sample data and production/remote guards
 - [x] Integration tests for role escalation, profile protection, private settings
 

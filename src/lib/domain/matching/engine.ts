@@ -35,7 +35,7 @@ export interface MatchRequirement {
 export interface MatchCandidate {
   specialistId: string;
   isPublished: boolean;
-  accountStatus: "active" | "suspended";
+  accountStatus: "active" | "suspended" | "deleted";
   availability: Availability;
   verificationStatus: "not_submitted" | "pending" | "verified" | "rejected";
   experienceLevel: Experience | null;

@@ -22,7 +22,8 @@ export type AnalyticsEvent =
   | "revision_requested"
   | "order_completed"
   | "review_submitted"
-  | "repeat_hire_started";
+  | "repeat_hire_started"
+  | "account_deleted";
 
 type Primitive = string | number | boolean | null;
 export type AnalyticsProperties = Record<string, Primitive>;

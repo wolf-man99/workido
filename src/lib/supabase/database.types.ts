@@ -954,6 +954,9 @@ isOneToOne: false
             "accept_offer":
 { Args: { "p_offer_id": string }; Returns: string
                            },
+"account_deletion_blocker":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
 "admin_mark_payout":
 { Args: { "p_order_id": string,"p_reference": string }; Returns: undefined
                            },
@@ -1056,6 +1059,9 @@ isOneToOne: false
                            },
 "decline_offer":
 { Args: { "p_offer_id": string }; Returns: undefined
+                           },
+"delete_my_account":
+{ Args: { "p_confirmation": string }; Returns: string
                            },
 "escape_like":
 { Args: { "p_value": string }; Returns: string
@@ -1196,7 +1202,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "account_status": "active"|"suspended","app_role": "buyer"|"specialist"|"admin","availability_status": "available"|"busy"|"unavailable","dispute_outcome": "complete_order"|"refund_buyer"|"resume_work","dispute_status": "open"|"resolved","experience_level": "entry"|"intermediate"|"expert","invitation_status": "invited"|"declined"|"offered","message_type": "text"|"file"|"system","offer_status": "pending"|"accepted"|"declined"|"withdrawn","order_status": "pending_payment"|"paid"|"in_progress"|"submitted"|"revision_requested"|"completed"|"cancelled"|"disputed"|"refund_pending"|"refunded","payment_status": "created"|"succeeded"|"failed"|"refunded","payout_status": "not_due"|"pending"|"paid_out"|"on_hold","publication_status": "draft"|"published"|"unpublished"|"removed","refund_status": "pending"|"processing"|"succeeded"|"failed","report_status": "open"|"reviewed"|"dismissed","report_target": "message"|"user"|"service","requirement_status": "draft"|"open"|"hired"|"closed","urgency_level": "flexible"|"standard"|"urgent","verification_status": "not_submitted"|"pending"|"verified"|"rejected","visibility": "public"|"hidden"
+            "account_status": "active"|"suspended"|"deleted","app_role": "buyer"|"specialist"|"admin","availability_status": "available"|"busy"|"unavailable","dispute_outcome": "complete_order"|"refund_buyer"|"resume_work","dispute_status": "open"|"resolved","experience_level": "entry"|"intermediate"|"expert","invitation_status": "invited"|"declined"|"offered","message_type": "text"|"file"|"system","offer_status": "pending"|"accepted"|"declined"|"withdrawn","order_status": "pending_payment"|"paid"|"in_progress"|"submitted"|"revision_requested"|"completed"|"cancelled"|"disputed"|"refund_pending"|"refunded","payment_status": "created"|"succeeded"|"failed"|"refunded","payout_status": "not_due"|"pending"|"paid_out"|"on_hold","publication_status": "draft"|"published"|"unpublished"|"removed","refund_status": "pending"|"processing"|"succeeded"|"failed","report_status": "open"|"reviewed"|"dismissed","report_target": "message"|"user"|"service","requirement_status": "draft"|"open"|"hired"|"closed","urgency_level": "flexible"|"standard"|"urgent","verification_status": "not_submitted"|"pending"|"verified"|"rejected","visibility": "public"|"hidden"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1316,7 +1322,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "account_status": ["active", "suspended"],"app_role": ["buyer", "specialist", "admin"],"availability_status": ["available", "busy", "unavailable"],"dispute_outcome": ["complete_order", "refund_buyer", "resume_work"],"dispute_status": ["open", "resolved"],"experience_level": ["entry", "intermediate", "expert"],"invitation_status": ["invited", "declined", "offered"],"message_type": ["text", "file", "system"],"offer_status": ["pending", "accepted", "declined", "withdrawn"],"order_status": ["pending_payment", "paid", "in_progress", "submitted", "revision_requested", "completed", "cancelled", "disputed", "refund_pending", "refunded"],"payment_status": ["created", "succeeded", "failed", "refunded"],"payout_status": ["not_due", "pending", "paid_out", "on_hold"],"publication_status": ["draft", "published", "unpublished", "removed"],"refund_status": ["pending", "processing", "succeeded", "failed"],"report_status": ["open", "reviewed", "dismissed"],"report_target": ["message", "user", "service"],"requirement_status": ["draft", "open", "hired", "closed"],"urgency_level": ["flexible", "standard", "urgent"],"verification_status": ["not_submitted", "pending", "verified", "rejected"],"visibility": ["public", "hidden"]
+            "account_status": ["active", "suspended", "deleted"],"app_role": ["buyer", "specialist", "admin"],"availability_status": ["available", "busy", "unavailable"],"dispute_outcome": ["complete_order", "refund_buyer", "resume_work"],"dispute_status": ["open", "resolved"],"experience_level": ["entry", "intermediate", "expert"],"invitation_status": ["invited", "declined", "offered"],"message_type": ["text", "file", "system"],"offer_status": ["pending", "accepted", "declined", "withdrawn"],"order_status": ["pending_payment", "paid", "in_progress", "submitted", "revision_requested", "completed", "cancelled", "disputed", "refund_pending", "refunded"],"payment_status": ["created", "succeeded", "failed", "refunded"],"payout_status": ["not_due", "pending", "paid_out", "on_hold"],"publication_status": ["draft", "published", "unpublished", "removed"],"refund_status": ["pending", "processing", "succeeded", "failed"],"report_status": ["open", "reviewed", "dismissed"],"report_target": ["message", "user", "service"],"requirement_status": ["draft", "open", "hired", "closed"],"urgency_level": ["flexible", "standard", "urgent"],"verification_status": ["not_submitted", "pending", "verified", "rejected"],"visibility": ["public", "hidden"]
           }
         }
 } as const

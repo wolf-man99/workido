@@ -45,6 +45,7 @@ VITEST_INTEGRATION=1 npx vitest run tests/integration/payments-webhook.test.ts
 | Login, wrong password | e2e `auth.spec.ts` |
 | Logout | e2e `auth.spec.ts` (account menu), `responsive.spec.ts` (mobile menu) |
 | Password recovery | e2e `auth.spec.ts` — requests a reset, follows the emailed link from Mailpit, sets a new password, old password rejected |
+| Account deletion | integration `account-deletion` (confirmation sentence, erase vs anonymise, blocked by active orders and pending payouts, unpaid orders cancelled, email reusable, admins), e2e `account-deletion.spec.ts` (buyer and specialist through the dialog, blocked state) |
 | Protected routes | e2e `access-control.spec.ts`, `auth.spec.ts` (redirect to login and back to the requested page) |
 
 ### Roles and permissions

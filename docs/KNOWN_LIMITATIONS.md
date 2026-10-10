@@ -41,7 +41,8 @@ What the MVP deliberately does not do yet, and what has to be configured outside
 ## Accounts and trust
 
 - **Email + password only.** No social login, phone OTP or two-factor authentication.
-- **Self-serve account deletion and data export are not implemented.** Handle requests via the support inbox; admins can suspend accounts.
+- **Self-serve data export is not implemented** (account deletion is, in Account settings). Handle export requests via the support inbox.
+- **Account deletion waits for active work and payouts.** People with orders in progress, an open dispute or a payout still being settled are asked to finish those first. Administrators can't delete their own account from the app. Order files and messages stay with the order for the other party.
 - **Verification is a manual admin review** of the specialist's profile and portfolio. No ID or document checks are integrated.
 - **Messages are not automatically moderated.** Users can report messages, listings and profiles; admins review reports.
 - **Rate limiting** relies on Supabase Auth's built-in limits for sign-up/login/recovery plus a database limit on the contact form. Other write paths are protected by authorisation, not throttling; add edge rate limiting (e.g. your host's firewall) before a public launch.
