@@ -20,7 +20,7 @@ export function renderNotificationEmail(notification: OutboundNotification, reci
   ].join("\n");
   const html = `<!doctype html><html><body style="font-family:Inter,Arial,sans-serif;background:#FFFDF8;color:#171717;padding:24px">
 <div style="max-width:520px;margin:0 auto;background:#fff;border:1px solid #E4E2DC;border-radius:16px;padding:24px">
-<p style="font-weight:700;font-size:20px;margin:0 0 16px">workido<span style="color:#FF6B35">.</span></p>
+<p style="font-weight:700;font-size:20px;margin:0 0 16px"><span style="color:#FF6B35">.</span>workido<span style="color:#FF6B35">.</span></p>
 <p>Hi ${escapeHtml(firstName)},</p>
 <p style="font-weight:600;font-size:16px">${escapeHtml(notification.title)}</p>
 ${notification.body ? `<p>${escapeHtml(notification.body)}</p>` : ""}
