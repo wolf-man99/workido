@@ -1,0 +1,20 @@
+/** Shared by the unit test (TypeScript rule) and the integration test (database rule), so both stay in sync. */
+export const CONTACT_CASES: [string, boolean][] = [
+  ["call me on 98765 43210", true],
+  ["+91-98765-43210", true],
+  ["my email is a.b@gmail.com", true],
+  ["ping me on WhatsApp", true],
+  ["whats app works too", true],
+  ["add me on telegram", true],
+  ["wa.me/919876543210", true],
+  ["pay via gpay pls", true],
+  ["PhonePe or Paytm is fine", true],
+  ["send to nisha@okaxis", true],
+  ["can we do this outside the platform", true],
+  ["pay me directly and I'll start", true],
+  ["Price is ₹4,500 for 3 days", false],
+  ["Order WK-AB12CD34EF due 2026-10-14", false],
+  ["Happy to help with your logo!", false],
+  ["I can deliver 3 posts and 1 carousel", false],
+  ["Can you make it more upbeat?", false],
+];

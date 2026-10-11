@@ -72,15 +72,23 @@ describe("pre-order enquiries", () => {
     expect(intrude).not.toBeNull();
   });
 
-  it("keeps enquiries text-only", async () => {
+  it("keeps enquiry attachments in the conversation's own folder", async () => {
+    const { error: elsewhere } = await buyer.client.from("messages").insert({
+      conversation_id: conversationId,
+      sender_id: buyer.id,
+      message_type: "file",
+      attachment_path: `${specialist.user.id}/brief.pdf`,
+      attachment_name: "brief.pdf",
+    });
+    expect(elsewhere?.message).toMatch(/Invalid attachment path/);
     const { error } = await buyer.client.from("messages").insert({
       conversation_id: conversationId,
       sender_id: buyer.id,
       message_type: "file",
-      attachment_path: `${conversationId}/messages/brief.pdf`,
+      attachment_path: `${conversationId}/brief.pdf`,
       attachment_name: "brief.pdf",
     });
-    expect(error?.message).toMatch(/once an order is placed/);
+    expect(error).toBeNull();
   });
 
   it("notes the order in the enquiry when the buyer orders, without a notification", async () => {

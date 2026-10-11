@@ -6,7 +6,7 @@ Defined in `src/lib/domain/orders/state-machine.ts` and enforced by `public.orde
 
 | Status | Meaning |
 | --- | --- |
-| `pending_payment` | Order created from a gig or an accepted offer; waiting for verified payment |
+| `pending_payment` | Order created from a gig, an accepted offer, or a proposal agreed in chat; waiting for verified payment |
 | `paid` | Payment verified; waiting for the specialist to accept |
 | `in_progress` | Specialist accepted; work underway (delivery deadline starts now) |
 | `submitted` | Deliverables submitted for the buyer's review |

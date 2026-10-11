@@ -2,6 +2,7 @@
 
 import { getPublicEnv } from "@/lib/config/public-env";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { baseMimeType } from "./file-validation";
 
 /**
  * Uploads a file straight to Supabase Storage with progress reporting.
@@ -36,7 +37,7 @@ export async function uploadWithProgress({
     xhr.setRequestHeader("Authorization", `Bearer ${session.access_token}`);
     xhr.setRequestHeader("apikey", env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
     xhr.setRequestHeader("x-upsert", upsert ? "true" : "false");
-    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+    xhr.setRequestHeader("Content-Type", baseMimeType(file.type) || "application/octet-stream");
     xhr.setRequestHeader("Cache-Control", "max-age=3600");
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) onProgress?.(event.loaded / event.total);

@@ -12,9 +12,10 @@
 --   * orders between the two test accounts waiting on each side
 --     (paid, in progress, submitted, completed), completed orders with
 --     sample reviews, an open requirement with two offers, an invitation,
---     and pre-order chats (one answered, one waiting for the specialist)
+--     and pre-order chats (one with a proposal waiting for the test buyer,
+--     one waiting for the test specialist's reply)
 --
--- Requires every migration up to 20261010000300_enquiries.sql.
+-- Requires every migration up to 20261011000100_chat_proposals_media_replies.sql.
 --
 -- How to run:
 --   1. Replace CHANGE-ME-BEFORE-RUNNING below with a password (10+ characters).
@@ -386,7 +387,15 @@ begin
   perform set_config('request.jwt.claims', jsonb_build_object('sub', v_specialist, 'role', 'authenticated')::text, true);
   perform set_config('request.jwt.claim.sub', v_specialist::text, true);
   insert into public.messages (conversation_id, sender_id, body)
-    values (v_conversation, v_specialist, 'Sample message: yes, I can add 9:16 versions. Order the gig and mention it in your requirements.');
+    values (v_conversation, v_specialist, 'Sample message: yes, I can add 9:16 versions. I''ll send you a proposal with them included.');
+  -- ...and a proposal the test buyer can accept or counter once.
+  perform public.send_proposal(
+    v_conversation,
+    'Instagram posts plus story versions',
+    'Sample proposal: three on-brand Instagram posts plus matching 9:16 story versions, from your copy, logo and colours.',
+    '3 posts (1080x1350) and 3 stories (1080x1920) as PNG, plus editable Canva links',
+    140000, 72, 1,
+    (select id from public.services where specialist_id = v_specialist and title = 'Instagram post design (set of 3)'));
 
   -- Nisha asking Test Specialist about the brand kit, waiting for a reply.
   v_buyer := (v_ids ->> 'nisha')::uuid;

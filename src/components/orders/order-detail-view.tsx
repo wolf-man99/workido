@@ -26,6 +26,8 @@ interface Scope {
   reference_links?: string[] | null;
   service_slug?: string | null;
   category?: string | null;
+  agreed_terms?: "original" | "counter" | null;
+  counter_note?: string | null;
 }
 
 const DISPUTE_REASON_LABELS: Record<string, string> = {
@@ -57,7 +59,7 @@ export function OrderDetailView({ detail, viewer, viewerId }: { detail: OrderDet
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <span className="font-mono">{order.order_number}</span>
           <span>·</span>
-          <span>{order.source === "service" ? "Predefined gig" : "Custom requirement"}</span>
+          <span>{order.source === "service" ? "Predefined gig" : order.source === "proposal" ? "Proposal agreed in chat" : "Custom requirement"}</span>
           {scope.category ? (
             <>
               <span>·</span>
@@ -341,6 +343,9 @@ export function OrderDetailView({ detail, viewer, viewerId }: { detail: OrderDet
               {scope.deliverables ? <ScopeItem label="Deliverables" value={scope.deliverables} /> : null}
               {scope.description ? <ScopeItem label="Description" value={scope.description} /> : null}
               {scope.offer_message ? <ScopeItem label="Specialist's offer" value={scope.offer_message} /> : null}
+              {scope.agreed_terms === "counter" ? (
+                <ScopeItem label="Agreed terms" value={`The buyer's counter-offer was accepted${scope.counter_note ? `. Buyer's note: ${scope.counter_note}` : "."}`} />
+              ) : null}
               {order.buyer_brief && order.source === "service" ? <ScopeItem label="Buyer's requirements" value={order.buyer_brief} /> : null}
               {scope.quantity ? <ScopeItem label="Quantity" value={String(scope.quantity)} /> : null}
               {scope.reference_links && scope.reference_links.length > 0 ? (

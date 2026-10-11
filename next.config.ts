@@ -10,7 +10,8 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=(self \"https://checkout.razorpay.com\")",
+    // Microphone: voice notes in chat (our own pages only, never embedded frames).
+    value: "camera=(), microphone=(self), geolocation=(), payment=(self \"https://checkout.razorpay.com\")",
   },
 ];
 

@@ -8,14 +8,13 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireUser } from "@/lib/auth/session";
+import { isProposalOpen, MESSAGE_COLUMNS, PROPOSAL_COLUMNS, type ProposalView } from "@/lib/chat/messages";
 import { formatMoney } from "@/lib/domain/money";
 import type { OrderStatus } from "@/lib/domain/orders/state-machine";
-import { formatDeliveryTime } from "@/lib/format";
+import { formatDate, formatDeliveryTime } from "@/lib/format";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Conversation" };
-
-const MESSAGE_COLUMNS = "id, sender_id, message_type, body, attachment_path, attachment_name, attachment_size, created_at";
 
 export default async function ConversationPage(props: PageProps<"/dashboard/messages/[id]">) {
   const { id } = await props.params;
@@ -26,7 +25,7 @@ export default async function ConversationPage(props: PageProps<"/dashboard/mess
   const { data: conversation } = await supabase
     .from("conversations")
     .select(
-      "id, kind, buyer_id, specialist_id, orders(id, title, order_number, status, buyer_id, specialist_id), services(id, title, slug, price_minor, currency, delivery_time_hours, included_revisions, buyer_instructions, publication_status)",
+      "id, kind, buyer_id, specialist_id, orders(id, title, order_number, status, buyer_id, specialist_id), services(id, title, slug, description, deliverables, price_minor, currency, delivery_time_hours, included_revisions, buyer_instructions, publication_status)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -41,7 +40,7 @@ export default async function ConversationPage(props: PageProps<"/dashboard/mess
   if (!isParticipant && !user.isAdmin) notFound();
   const isBuyer = user.id === buyerId;
 
-  const [{ data: messages }, { data: people }, { data: ordersTogether }] = await Promise.all([
+  const [{ data: messages }, { data: people }, { data: ordersTogether }, { data: proposalRows }] = await Promise.all([
     supabase.from("messages").select(MESSAGE_COLUMNS).eq("conversation_id", id).order("created_at").limit(500),
     supabase.from("profiles").select("id, full_name, username, avatar_path").in("id", [buyerId, specialistId]),
     order
@@ -53,7 +52,11 @@ export default async function ConversationPage(props: PageProps<"/dashboard/mess
           .eq("specialist_id", specialistId)
           .order("created_at", { ascending: false })
           .limit(5),
+    order
+      ? Promise.resolve({ data: [] })
+      : supabase.from("chat_proposals").select(PROPOSAL_COLUMNS).eq("conversation_id", id).order("created_at", { ascending: false }).limit(50),
   ]);
+  const proposals = (proposalRows ?? []) as ProposalView[];
   const names = Object.fromEntries((people ?? []).map((person) => [person.id, person.full_name]));
   const counterpartId = isBuyer ? specialistId : buyerId;
   const counterpart = (people ?? []).find((person) => person.id === counterpartId);
@@ -84,6 +87,21 @@ export default async function ConversationPage(props: PageProps<"/dashboard/mess
   // Pre-order enquiry.
   const service = conversation.services;
   const canOrder = isBuyer && service?.publication_status === "published";
+  const isSpecialist = user.id === specialistId;
+  const latestProposal = proposals[0];
+  const latestProposalMessage = latestProposal ? (messages ?? []).find((m) => m.proposal_id === latestProposal.id) : undefined;
+  const proposalDefaults =
+    isSpecialist && canSend
+      ? {
+          serviceId: service?.id ?? null,
+          title: service?.title ?? "",
+          description: service?.description ?? "",
+          deliverables: service?.deliverables ?? "",
+          priceMinor: service?.price_minor ?? null,
+          deliveryTimeHours: service?.delivery_time_hours ?? null,
+          revisions: service?.included_revisions ?? null,
+        }
+      : null;
   return (
     <>
       <div className="flex flex-wrap items-center gap-3">
@@ -106,15 +124,60 @@ export default async function ConversationPage(props: PageProps<"/dashboard/mess
           currentUserId={user.id}
           names={names}
           initialMessages={messages ?? []}
+          initialProposals={proposals}
+          proposalDefaults={proposalDefaults}
           canSend={canSend}
           emptyText={
             isBuyer
               ? "Say hello and ask anything about the work. You only pay when you place an order."
-              : "No messages yet."
+              : "No messages yet. You can answer questions here or send a proposal."
           }
         />
 
         <aside className="order-first flex flex-col gap-4 lg:order-last">
+          {latestProposal ? (
+            // Small screens already show the proposal in the chat, right below.
+            <Card className="hidden border-brand/30 lg:block">
+              <CardHeader>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Latest proposal</p>
+                <CardTitle className="text-lg">{latestProposal.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-2 text-sm">
+                <p className="text-ink-soft">
+                  <span className="font-display text-2xl font-bold text-ink">
+                    {formatMoney(
+                      latestProposal.accepted_terms === "counter" && latestProposal.counter_price_minor ? latestProposal.counter_price_minor : latestProposal.price_minor,
+                      latestProposal.currency,
+                    )}
+                  </span>
+                  {" · "}
+                  {formatDeliveryTime(
+                    latestProposal.accepted_terms === "counter" && latestProposal.counter_delivery_time_hours
+                      ? latestProposal.counter_delivery_time_hours
+                      : latestProposal.delivery_time_hours,
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {latestProposal.status === "accepted"
+                    ? "Accepted"
+                    : latestProposal.status === "declined"
+                      ? "Declined"
+                      : latestProposal.status === "withdrawn"
+                        ? "Withdrawn"
+                        : !isProposalOpen(latestProposal)
+                          ? "Expired"
+                          : latestProposal.status === "countered"
+                            ? "Counter-offer waiting for the specialist"
+                            : `Open until ${formatDate(latestProposal.expires_at)}`}
+                </p>
+                {latestProposalMessage ? (
+                  <a href={`#message-${latestProposalMessage.id}`} className="font-semibold text-brand-text hover:underline">
+                    See it in the chat
+                  </a>
+                ) : null}
+              </CardContent>
+            </Card>
+          ) : null}
           {service ? (
             <Card>
               <CardHeader>
@@ -139,7 +202,7 @@ export default async function ConversationPage(props: PageProps<"/dashboard/mess
                 ) : isBuyer ? (
                   <p className="text-sm text-muted-foreground">This gig isn&apos;t available to order right now.</p>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Answer their questions here. They can order this gig straight from the chat.</p>
+                  <p className="text-sm text-muted-foreground">They can order this gig as listed, or you can send a proposal with your own scope and price.</p>
                 )}
               </CardContent>
             </Card>

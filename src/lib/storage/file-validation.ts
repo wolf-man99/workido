@@ -8,9 +8,9 @@
  * always served as downloads through short-lived signed URLs.
  */
 
-export type UploadPurpose = "avatar" | "portfolio" | "requirement" | "deliverable" | "message" | "dispute";
+export type UploadPurpose = "avatar" | "portfolio" | "requirement" | "deliverable" | "message" | "chat" | "dispute";
 
-export type FileFamily = "png" | "jpeg" | "gif" | "webp" | "pdf" | "zip" | "mp4" | "mp3" | "wav" | "text";
+export type FileFamily = "png" | "jpeg" | "gif" | "webp" | "pdf" | "zip" | "mp4" | "mp3" | "wav" | "webm" | "ogg" | "text";
 
 const MIME_FAMILY: Record<string, FileFamily> = {
   "image/png": "png",
@@ -27,6 +27,10 @@ const MIME_FAMILY: Record<string, FileFamily> = {
   "video/quicktime": "mp4",
   "audio/mpeg": "mp3",
   "audio/wav": "wav",
+  // Voice notes recorded in the browser (Chrome, Firefox, Safari).
+  "audio/webm": "webm",
+  "audio/ogg": "ogg",
+  "audio/mp4": "mp4",
   "text/plain": "text",
   "text/csv": "text",
 };
@@ -43,6 +47,8 @@ const DOCUMENTS = [
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 ];
 const MEDIA = ["video/mp4", "video/quicktime", "audio/mpeg", "audio/wav"];
+/** Formats MediaRecorder produces for voice notes. */
+export const VOICE_NOTE_TYPES = ["audio/webm", "audio/ogg", "audio/mp4"];
 
 /** Mirrors the bucket limits in supabase/migrations/20261009000800_storage.sql. */
 export const UPLOAD_RULES: Record<UploadPurpose, { bucket: string; maxBytes: number; mimeTypes: string[] }> = {
@@ -50,12 +56,18 @@ export const UPLOAD_RULES: Record<UploadPurpose, { bucket: string; maxBytes: num
   portfolio: { bucket: "portfolio", maxBytes: 10 * MB, mimeTypes: [...IMAGES, "image/gif"] },
   requirement: { bucket: "requirement-files", maxBytes: 25 * MB, mimeTypes: [...IMAGES, "image/gif", ...DOCUMENTS] },
   deliverable: { bucket: "order-files", maxBytes: 50 * MB, mimeTypes: [...IMAGES, "image/gif", ...DOCUMENTS, ...MEDIA] },
-  message: { bucket: "order-files", maxBytes: 50 * MB, mimeTypes: [...IMAGES, "image/gif", ...DOCUMENTS, ...MEDIA] },
+  message: { bucket: "order-files", maxBytes: 50 * MB, mimeTypes: [...IMAGES, "image/gif", ...DOCUMENTS, ...MEDIA, ...VOICE_NOTE_TYPES] },
+  chat: { bucket: "chat-files", maxBytes: 25 * MB, mimeTypes: [...IMAGES, "image/gif", ...DOCUMENTS, "audio/mpeg", "audio/wav", ...VOICE_NOTE_TYPES] },
   dispute: { bucket: "order-files", maxBytes: 25 * MB, mimeTypes: [...IMAGES, ...DOCUMENTS] },
 };
 
 export function acceptAttribute(purpose: UploadPurpose): string {
-  return UPLOAD_RULES[purpose].mimeTypes.join(",");
+  return UPLOAD_RULES[purpose].mimeTypes.filter((type) => !VOICE_NOTE_TYPES.includes(type)).join(",");
+}
+
+/** "audio/webm;codecs=opus" -> "audio/webm" */
+export function baseMimeType(type: string): string {
+  return type.split(";")[0]!.trim().toLowerCase();
 }
 
 export type ValidationResult = { ok: true } | { ok: false; error: string };
@@ -67,7 +79,7 @@ export function validateFileMetadata(purpose: UploadPurpose, file: { size: numbe
   if (file.size > rules.maxBytes) {
     return { ok: false, error: `Files must be ${Math.round(rules.maxBytes / MB)} MB or smaller.` };
   }
-  if (!rules.mimeTypes.includes(file.type)) {
+  if (!rules.mimeTypes.includes(baseMimeType(file.type))) {
     return { ok: false, error: "This file type isn't supported here." };
   }
   if (file.name.length > 200) return { ok: false, error: "The file name is too long." };
@@ -92,6 +104,8 @@ export function sniffFileFamily(bytes: Uint8Array): FileFamily | null {
   if (ascii(bytes, 0, 4) === "RIFF" && ascii(bytes, 8, 4) === "WAVE") return "wav";
   if (ascii(bytes, 0, 5) === "%PDF-") return "pdf";
   if (startsWith(bytes, [0x50, 0x4b, 0x03, 0x04]) || startsWith(bytes, [0x50, 0x4b, 0x05, 0x06])) return "zip";
+  if (startsWith(bytes, [0x1a, 0x45, 0xdf, 0xa3])) return "webm";
+  if (ascii(bytes, 0, 4) === "OggS") return "ogg";
   if (ascii(bytes, 4, 4) === "ftyp") return "mp4";
   if (ascii(bytes, 0, 3) === "ID3" || startsWith(bytes, [0xff, 0xfb]) || startsWith(bytes, [0xff, 0xf3]) || startsWith(bytes, [0xff, 0xf2])) {
     return "mp3";
@@ -115,7 +129,7 @@ function looksLikeText(bytes: Uint8Array): boolean {
 
 /** Server-side check that stored bytes match the declared type. */
 export function verifyFileSignature(declaredMime: string, leadingBytes: Uint8Array): ValidationResult {
-  const expected = MIME_FAMILY[declaredMime];
+  const expected = MIME_FAMILY[baseMimeType(declaredMime)];
   if (!expected) return { ok: false, error: "This file type isn't supported." };
   const actual = sniffFileFamily(leadingBytes);
   if (actual !== expected) {

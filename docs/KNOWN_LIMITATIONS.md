@@ -6,7 +6,7 @@ What the MVP deliberately does not do yet, and what has to be configured outside
 
 | Dependency | Needed for | Without it | How |
 | --- | --- | --- | --- |
-| Migrations applied to the hosted Supabase project | Everything | Done for `bquiwujcuynajxrxequh` (SQL editor); future migration files must be applied too | [DEPLOYMENT.md](DEPLOYMENT.md) §1 |
+| Migrations applied to the hosted Supabase project | Everything | `bquiwujcuynajxrxequh` has migrations up to `20261009001200`; apply the `20261010*` and `20261011*` files in order to enable account deletion, pre-order chat and proposals | [DEPLOYMENT.md](DEPLOYMENT.md) §1 |
 | `SUPABASE_SERVICE_ROLE_KEY` (server only) | Payments, refunds, webhooks, email dispatch | Checkout says payments aren't available; emails aren't sent | Hosting secret settings — never in chat or code |
 | Razorpay account, KYC, API keys, webhook secret | Real payments and refunds | Use `PAYMENT_PROVIDER=dev` (test mode, clearly labelled) or leave payments disabled | [PAYMENTS.md](PAYMENTS.md) |
 | Custom SMTP in Supabase Auth | Reliable sign-up confirmation and password-reset emails | Supabase's built-in sender is rate-limited and for testing only | Supabase → Authentication → SMTP |
@@ -32,11 +32,13 @@ What the MVP deliberately does not do yet, and what has to be configured outside
 - **Order changes after creation** (scope or price amendments, tips, extensions) are not supported; a new order is required.
 - **Dispute evidence** is the dispute description plus the order's messages and files; there is no separate evidence upload or appeal flow.
 
-## Pre-order chat
+## Chat
 
-- **Text only.** Files can be shared once an order exists (they're stored with the order).
-- **No custom quotes in the chat yet.** After talking, the buyer orders the gig at its listed price, or posts a custom task and invites the specialist for a tailored offer.
 - **Only buyers start chats**, at most 20 new specialists a day, to keep specialists' inboxes free of cold outreach.
+- **Proposals: one open at a time, one counter-offer.** A new proposal replaces the open one. The buyer's counter can change price and delivery time only (not scope or revisions). Proposals expire after 7 days; expiry is checked when someone acts on it, not by a background job.
+- **Voice notes** are capped at 3 minutes and need a browser with microphone recording (current Chrome, Edge, Firefox, Safari). They aren't transcribed, so their content isn't covered by the contact-detail check.
+- **Contact-detail detection is a reminder, not a block.** It catches phone numbers, emails, messaging apps, UPI IDs and "pay outside" phrases in text, and flags the message for admins. Determined users can still get around it (spelling numbers out, images, voice notes); disputes and refunds only covering on-platform orders is the real incentive.
+- **Attachments are not virus-scanned** (same as all uploads). Pre-order chat files are limited to 25 MB; order chat files to 50 MB.
 
 ## Matching and discovery
 

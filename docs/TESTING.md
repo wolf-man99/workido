@@ -82,6 +82,8 @@ Integration `messaging-files`: participants only, no sender spoofing or system m
 ### Pre-order chat
 Integration `enquiries`: one chat per buyer and specialist, no self-messaging or unpublished specialists or other people's gigs, hidden from the specialist until the buyer writes, participants only, notifications name the gig, text only, order note without a notification, daily limit, removed with a deleted account. E2e `marketplace.spec.ts` (journey 3).
 
+Integration `chat`: proposals (only the specialist sends; participants only; no direct writes or faked events; a new proposal replaces the open one; exactly one counter-offer; declined counter leaves the original acceptable; accepted counter creates the order at counter terms with a checkout link; expired, declined and withdrawn proposals refused; not available in order chats; the order survives the buyer deleting their account), replies within the same conversation only, contact-detail flags matching the TypeScript rule case for case (`tests/support/contact-cases.ts`), files and voice notes before ordering, private pre-order files, voice notes in order chats. Unit `chat`: contact detection, proposal and counter-offer validation, proposal expiry. E2e `chat.spec.ts`: the contact warning, an image, a voice note from a simulated microphone, a reply, a proposal, one counter-offer, the specialist accepting it, and checkout at the counter price.
+
 ### Reviews
 Integration `order-lifecycle` (participants of completed orders only, once each, not before completion); e2e `marketplace.spec.ts` (one review per order, then "Hire again").
 

@@ -64,3 +64,29 @@ describe("storageFileName", () => {
     expect(storageFileName("résumé.docx", "x")).toBe("x-resume.docx");
   });
 });
+
+describe("voice notes", () => {
+  it("recognises browser-recorded audio", () => {
+    expect(sniffFileFamily(new Uint8Array([0x1a, 0x45, 0xdf, 0xa3, 0x9f, 0x42]))).toBe("webm");
+    expect(sniffFileFamily(new TextEncoder().encode("OggS\0\u0002"))).toBe("ogg");
+    const m4a = new Uint8Array(12);
+    m4a.set(new TextEncoder().encode("ftypM4A "), 4);
+    expect(verifyFileSignature("audio/mp4", m4a)).toEqual({ ok: true });
+  });
+
+  it("accepts codec parameters in the declared type", () => {
+    expect(verifyFileSignature("audio/webm;codecs=opus", new Uint8Array([0x1a, 0x45, 0xdf, 0xa3]))).toEqual({ ok: true });
+    expect(validateFileMetadata("chat", { size: 1000, type: "audio/webm;codecs=opus", name: "voice.webm" })).toEqual({ ok: true });
+  });
+
+  it("rejects audio that isn't what it claims", () => {
+    expect(verifyFileSignature("audio/webm", new TextEncoder().encode("<html>")).ok).toBe(false);
+  });
+
+  it("allows voice notes and images in pre-order chats but not video", () => {
+    expect(validateFileMetadata("chat", { size: 1000, type: "image/png", name: "ref.png" }).ok).toBe(true);
+    expect(validateFileMetadata("chat", { size: 1000, type: "video/mp4", name: "clip.mp4" }).ok).toBe(false);
+    expect(validateFileMetadata("message", { size: 1000, type: "audio/ogg", name: "voice.ogg" }).ok).toBe(true);
+  });
+});
+

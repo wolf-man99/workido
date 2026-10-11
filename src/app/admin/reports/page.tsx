@@ -14,13 +14,19 @@ export const metadata: Metadata = { title: "Reports & support" };
 export default async function AdminReportsPage() {
   await requireAdmin();
   const supabase = await createSupabaseServerClient();
-  const [{ data: reports }, { data: contact }] = await Promise.all([
+  const [{ data: reports }, { data: contact }, { data: flagged }] = await Promise.all([
     supabase
       .from("reports")
       .select("id, target_type, target_id, reason, details, created_at, reporter:profiles!reports_reporter_id_fkey(full_name, username)")
       .eq("status", "open")
       .order("created_at"),
     supabase.from("contact_messages").select("id, name, email, topic, message, created_at").eq("status", "open").order("created_at").limit(50),
+    supabase
+      .from("messages")
+      .select("id, body, conversation_id, created_at, sender:profiles!messages_sender_id_fkey(full_name, username)")
+      .eq("contact_flagged", true)
+      .order("created_at", { ascending: false })
+      .limit(30),
   ]);
 
   // Resolve reported messages to their conversation for context.
@@ -82,6 +88,31 @@ export default async function AdminReportsPage() {
               </div>
             );
           })}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Messages that may share contact or payment details</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Flagged automatically. Both people saw a reminder to keep deals and payments on Workido. Nothing was blocked. Latest 30.
+          </p>
+        </CardHeader>
+        <CardContent className="flex flex-col divide-y divide-border">
+          {(flagged ?? []).length === 0 ? <p className="text-sm text-muted-foreground">No flagged messages.</p> : null}
+          {(flagged ?? []).map((item) => (
+            <div key={item.id} className="flex flex-col gap-1 py-3 text-sm">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold">{item.sender?.full_name ?? "Deleted user"}</span>
+                {item.sender?.username ? <span className="text-xs text-muted-foreground">@{item.sender.username}</span> : null}
+                <span className="text-xs text-muted-foreground">{formatDateTime(item.created_at)}</span>
+                <Link href={`/dashboard/messages/${item.conversation_id}`} className="text-xs font-semibold text-brand-text hover:underline">
+                  Open conversation
+                </Link>
+              </div>
+              <p className="line-clamp-3 whitespace-pre-line text-ink-soft">{item.body}</p>
+            </div>
+          ))}
         </CardContent>
       </Card>
 

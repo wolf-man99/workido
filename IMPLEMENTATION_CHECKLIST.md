@@ -68,7 +68,10 @@ Hosted Supabase project `bquiwujcuynajxrxequh`: all 12 migrations applied via th
 - [~] Accepted + in progress merged; approved + completed merged
 - [x] Order detail with timeline, checkout panel, role-specific actions
 - [x] Order-scoped realtime messaging with attachments and notifications
-- [x] Pre-order chat: "Contact" on gig pages and profiles opens a chat before any payment; the buyer orders the gig and pays from the chat (text-only until an order exists)
+- [x] Pre-order chat: "Contact" on gig pages and profiles opens a chat before any payment; the buyer orders the gig and pays from the chat
+- [x] Proposals in chat: the specialist sends scope, price, delivery and revisions; the buyer accepts and pays, declines, or counters once; the specialist accepts or declines the counter
+- [x] Chat attachments (images previewed inline, documents), voice notes (up to 3 minutes), replies to a specific message
+- [x] Stay-on-platform nudges: warning before sending contact or payment details, notes on flagged messages, safety banner in every chat, admin list of flagged messages
 - [x] Private file uploads (progress, server-side type inspection), signed short-lived downloads
 - [x] Deliverable submission (files + links, versioned), revisions within the included limit, approval, completion
 - [x] Append-only order event history

@@ -83,6 +83,44 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"chat_proposals": {
+                  Row: {
+                    "accepted_terms": string | null,"buyer_id": string,"conversation_id": string,"counter_declined_at": string | null,"counter_delivery_time_hours": number | null,"counter_note": string | null,"counter_price_minor": number | null,"countered_at": string | null,"created_at": string,"currency": string,"deliverables": string,"delivery_time_hours": number,"description": string,"expires_at": string,"id": string,"price_minor": number,"responded_at": string | null,"revisions_included": number,"service_id": string | null,"specialist_id": string,"status": string,"title": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "accepted_terms"?: string | null,"buyer_id": string,"conversation_id": string,"counter_declined_at"?: string | null,"counter_delivery_time_hours"?: number | null,"counter_note"?: string | null,"counter_price_minor"?: number | null,"countered_at"?: string | null,"created_at"?: string,"currency"?: string,"deliverables": string,"delivery_time_hours": number,"description": string,"expires_at"?: string,"id"?: string,"price_minor": number,"responded_at"?: string | null,"revisions_included": number,"service_id"?: string | null,"specialist_id": string,"status"?: string,"title": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "accepted_terms"?: string | null,"buyer_id"?: string,"conversation_id"?: string,"counter_declined_at"?: string | null,"counter_delivery_time_hours"?: number | null,"counter_note"?: string | null,"counter_price_minor"?: number | null,"countered_at"?: string | null,"created_at"?: string,"currency"?: string,"deliverables"?: string,"delivery_time_hours"?: number,"description"?: string,"expires_at"?: string,"id"?: string,"price_minor"?: number,"responded_at"?: string | null,"revisions_included"?: number,"service_id"?: string | null,"specialist_id"?: string,"status"?: string,"title"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "chat_proposals_buyer_id_fkey"
+      columns: ["buyer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "chat_proposals_conversation_id_fkey"
+      columns: ["conversation_id"]
+isOneToOne: false
+      referencedRelation: "conversations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "chat_proposals_service_id_fkey"
+      columns: ["service_id"]
+isOneToOne: false
+      referencedRelation: "services"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "chat_proposals_specialist_id_fkey"
+      columns: ["specialist_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"contact_messages": {
                   Row: {
                     "created_at": string,"email": string,"id": string,"message": string,"name": string,"status": string,"topic": string,"user_id": string | null
@@ -227,14 +265,14 @@ isOneToOne: false
                   ]
                 },"messages": {
                   Row: {
-                    "attachment_name": string | null,"attachment_path": string | null,"attachment_size": number | null,"attachment_type": string | null,"body": string | null,"conversation_id": string,"created_at": string,"id": string,"message_type": Database["public"]['Enums']["message_type"],"sender_id": string | null
+                    "attachment_duration_seconds": number | null,"attachment_name": string | null,"attachment_path": string | null,"attachment_size": number | null,"attachment_type": string | null,"body": string | null,"contact_flagged": boolean,"conversation_id": string,"created_at": string,"id": string,"message_type": Database["public"]['Enums']["message_type"],"proposal_id": string | null,"reply_to_id": string | null,"sender_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "attachment_name"?: string | null,"attachment_path"?: string | null,"attachment_size"?: number | null,"attachment_type"?: string | null,"body"?: string | null,"conversation_id": string,"created_at"?: string,"id"?: string,"message_type"?: Database["public"]['Enums']["message_type"],"sender_id"?: string | null
+                    "attachment_duration_seconds"?: number | null,"attachment_name"?: string | null,"attachment_path"?: string | null,"attachment_size"?: number | null,"attachment_type"?: string | null,"body"?: string | null,"contact_flagged"?: boolean,"conversation_id": string,"created_at"?: string,"id"?: string,"message_type"?: Database["public"]['Enums']["message_type"],"proposal_id"?: string | null,"reply_to_id"?: string | null,"sender_id"?: string | null
                   }
                   Update: {
-                    "attachment_name"?: string | null,"attachment_path"?: string | null,"attachment_size"?: number | null,"attachment_type"?: string | null,"body"?: string | null,"conversation_id"?: string,"created_at"?: string,"id"?: string,"message_type"?: Database["public"]['Enums']["message_type"],"sender_id"?: string | null
+                    "attachment_duration_seconds"?: number | null,"attachment_name"?: string | null,"attachment_path"?: string | null,"attachment_size"?: number | null,"attachment_type"?: string | null,"body"?: string | null,"contact_flagged"?: boolean,"conversation_id"?: string,"created_at"?: string,"id"?: string,"message_type"?: Database["public"]['Enums']["message_type"],"proposal_id"?: string | null,"reply_to_id"?: string | null,"sender_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -242,6 +280,18 @@ isOneToOne: false
       columns: ["conversation_id"]
 isOneToOne: false
       referencedRelation: "conversations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "messages_proposal_id_fkey"
+      columns: ["proposal_id"]
+isOneToOne: false
+      referencedRelation: "chat_proposals"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "messages_reply_to_id_fkey"
+      columns: ["reply_to_id"]
+isOneToOne: false
+      referencedRelation: "messages"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "messages_sender_id_fkey"
@@ -397,14 +447,14 @@ isOneToOne: false
                   ]
                 },"orders": {
                   Row: {
-                    "accepted_at": string | null,"buyer_brief": string | null,"buyer_fee_minor": number,"buyer_id": string,"cancellation_reason": string | null,"cancelled_at": string | null,"completed_at": string | null,"created_at": string,"currency": string,"delivery_deadline": string | null,"delivery_time_hours": number,"first_submitted_at": string | null,"id": string,"offer_id": string | null,"order_number": string,"paid_at": string | null,"payout_reference": string | null,"payout_status": Database["public"]['Enums']["payout_status"],"price_minor": number,"requirement_id": string | null,"revisions_included": number,"revisions_used": number,"scope_snapshot": NonNullable<Json>,"service_id": string | null,"source": string,"specialist_fee_minor": number,"specialist_id": string,"status": Database["public"]['Enums']["order_status"],"submitted_at": string | null,"title": string,"total_minor": number | null,"updated_at": string
+                    "accepted_at": string | null,"buyer_brief": string | null,"buyer_fee_minor": number,"buyer_id": string,"cancellation_reason": string | null,"cancelled_at": string | null,"completed_at": string | null,"created_at": string,"currency": string,"delivery_deadline": string | null,"delivery_time_hours": number,"first_submitted_at": string | null,"id": string,"offer_id": string | null,"order_number": string,"paid_at": string | null,"payout_reference": string | null,"payout_status": Database["public"]['Enums']["payout_status"],"price_minor": number,"proposal_id": string | null,"requirement_id": string | null,"revisions_included": number,"revisions_used": number,"scope_snapshot": NonNullable<Json>,"service_id": string | null,"source": string,"specialist_fee_minor": number,"specialist_id": string,"status": Database["public"]['Enums']["order_status"],"submitted_at": string | null,"title": string,"total_minor": number | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "accepted_at"?: string | null,"buyer_brief"?: string | null,"buyer_fee_minor"?: number,"buyer_id": string,"cancellation_reason"?: string | null,"cancelled_at"?: string | null,"completed_at"?: string | null,"created_at"?: string,"currency": string,"delivery_deadline"?: string | null,"delivery_time_hours": number,"first_submitted_at"?: string | null,"id"?: string,"offer_id"?: string | null,"order_number"?: string,"paid_at"?: string | null,"payout_reference"?: string | null,"payout_status"?: Database["public"]['Enums']["payout_status"],"price_minor": number,"requirement_id"?: string | null,"revisions_included": number,"revisions_used"?: number,"scope_snapshot": NonNullable<Json>,"service_id"?: string | null,"source": string,"specialist_fee_minor"?: number,"specialist_id": string,"status"?: Database["public"]['Enums']["order_status"],"submitted_at"?: string | null,"title": string,"total_minor"?: never,"updated_at"?: string
+                    "accepted_at"?: string | null,"buyer_brief"?: string | null,"buyer_fee_minor"?: number,"buyer_id": string,"cancellation_reason"?: string | null,"cancelled_at"?: string | null,"completed_at"?: string | null,"created_at"?: string,"currency": string,"delivery_deadline"?: string | null,"delivery_time_hours": number,"first_submitted_at"?: string | null,"id"?: string,"offer_id"?: string | null,"order_number"?: string,"paid_at"?: string | null,"payout_reference"?: string | null,"payout_status"?: Database["public"]['Enums']["payout_status"],"price_minor": number,"proposal_id"?: string | null,"requirement_id"?: string | null,"revisions_included": number,"revisions_used"?: number,"scope_snapshot": NonNullable<Json>,"service_id"?: string | null,"source": string,"specialist_fee_minor"?: number,"specialist_id": string,"status"?: Database["public"]['Enums']["order_status"],"submitted_at"?: string | null,"title": string,"total_minor"?: never,"updated_at"?: string
                   }
                   Update: {
-                    "accepted_at"?: string | null,"buyer_brief"?: string | null,"buyer_fee_minor"?: number,"buyer_id"?: string,"cancellation_reason"?: string | null,"cancelled_at"?: string | null,"completed_at"?: string | null,"created_at"?: string,"currency"?: string,"delivery_deadline"?: string | null,"delivery_time_hours"?: number,"first_submitted_at"?: string | null,"id"?: string,"offer_id"?: string | null,"order_number"?: string,"paid_at"?: string | null,"payout_reference"?: string | null,"payout_status"?: Database["public"]['Enums']["payout_status"],"price_minor"?: number,"requirement_id"?: string | null,"revisions_included"?: number,"revisions_used"?: number,"scope_snapshot"?: NonNullable<Json>,"service_id"?: string | null,"source"?: string,"specialist_fee_minor"?: number,"specialist_id"?: string,"status"?: Database["public"]['Enums']["order_status"],"submitted_at"?: string | null,"title"?: string,"total_minor"?: never,"updated_at"?: string
+                    "accepted_at"?: string | null,"buyer_brief"?: string | null,"buyer_fee_minor"?: number,"buyer_id"?: string,"cancellation_reason"?: string | null,"cancelled_at"?: string | null,"completed_at"?: string | null,"created_at"?: string,"currency"?: string,"delivery_deadline"?: string | null,"delivery_time_hours"?: number,"first_submitted_at"?: string | null,"id"?: string,"offer_id"?: string | null,"order_number"?: string,"paid_at"?: string | null,"payout_reference"?: string | null,"payout_status"?: Database["public"]['Enums']["payout_status"],"price_minor"?: number,"proposal_id"?: string | null,"requirement_id"?: string | null,"revisions_included"?: number,"revisions_used"?: number,"scope_snapshot"?: NonNullable<Json>,"service_id"?: string | null,"source"?: string,"specialist_fee_minor"?: number,"specialist_id"?: string,"status"?: Database["public"]['Enums']["order_status"],"submitted_at"?: string | null,"title"?: string,"total_minor"?: never,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -418,6 +468,12 @@ isOneToOne: false
       columns: ["offer_id"]
 isOneToOne: true
       referencedRelation: "offers"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "orders_proposal_id_fkey"
+      columns: ["proposal_id"]
+isOneToOne: true
+      referencedRelation: "chat_proposals"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "orders_requirement_id_fkey"
@@ -972,6 +1028,9 @@ isOneToOne: false
             "accept_offer":
 { Args: { "p_offer_id": string }; Returns: string
                            },
+"accept_proposal":
+{ Args: { "p_proposal_id": string }; Returns: string
+                           },
 "account_deletion_blocker":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
@@ -1019,6 +1078,7 @@ isOneToOne: false
 "payout_reference": string | null,
 "payout_status": Database["public"]['Enums']["payout_status"],
 "price_minor": number,
+"proposal_id": string | null,
 "requirement_id": string | null,
 "revisions_included": number,
 "revisions_used": number,
@@ -1063,11 +1123,20 @@ isOneToOne: false
 "can_review_order":
 { Args: { "p_order_id": string,"p_reviewee_id": string }; Returns: boolean
                            },
+"can_upload_chat_file":
+{ Args: { "p_conversation_id": string }; Returns: boolean
+                           },
 "can_upload_order_file":
 { Args: { "p_kind": string,"p_order_id": string }; Returns: boolean
                            },
 "can_upload_requirement_files":
 { Args: { "p_requirement_id": string }; Returns: boolean
+                           },
+"counter_proposal":
+{ Args: { "p_delivery_time_hours": number,"p_note"?: string,"p_price_minor": number,"p_proposal_id": string }; Returns: undefined
+                           },
+"create_order_from_proposal":
+{ Args: { "p_actor": string,"p_delivery_time_hours": number,"p_price_minor": number,"p_proposal": Omit<Database["public"]['Tables']["chat_proposals"]['Row'], Database["public"]['Tables']["chat_proposals"]['ComputedFields']> }; Returns: string
                            },
 "create_service_order":
 { Args: { "p_brief": string,"p_service_id": string }; Returns: string
@@ -1078,11 +1147,20 @@ isOneToOne: false
 "decline_offer":
 { Args: { "p_offer_id": string }; Returns: undefined
                            },
+"decline_proposal":
+{ Args: { "p_proposal_id": string }; Returns: undefined
+                           },
 "delete_my_account":
 { Args: { "p_confirmation": string }; Returns: string
                            },
 "escape_like":
 { Args: { "p_value": string }; Returns: string
+                           },
+"format_duration_hours":
+{ Args: { "p_hours": number }; Returns: string
+                           },
+"format_money_minor":
+{ Args: { "p_amount": number,"p_currency": string }; Returns: string
                            },
 "get_match_candidates":
 { Args: { "p_requirement_id": string }; Returns: {
@@ -1123,6 +1201,38 @@ isOneToOne: false
               "conversation_id": string,"counterpart_avatar": string,"counterpart_id": string,"counterpart_name": string,"counterpart_username": string,"kind": string,"last_message_at": string,"last_message_body": string,"last_message_type": Database["public"]['Enums']["message_type"],"last_sender_id": string,"order_id": string,"order_number": string,"order_status": Database["public"]['Enums']["order_status"],"order_title": string,"service_title": string,"unread_count": number
             }[]
                            },
+"lock_proposal_for":
+{ Args: { "p_proposal_id": string,"p_role": string }; Returns: {
+              "accepted_terms": string | null,
+"buyer_id": string,
+"conversation_id": string,
+"counter_declined_at": string | null,
+"counter_delivery_time_hours": number | null,
+"counter_note": string | null,
+"counter_price_minor": number | null,
+"countered_at": string | null,
+"created_at": string,
+"currency": string,
+"deliverables": string,
+"delivery_time_hours": number,
+"description": string,
+"expires_at": string,
+"id": string,
+"price_minor": number,
+"responded_at": string | null,
+"revisions_included": number,
+"service_id": string | null,
+"specialist_id": string,
+"status": string,
+"title": string,
+"updated_at": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "chat_proposals"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
 "mark_conversation_read":
 { Args: { "p_conversation_id": string }; Returns: undefined
                            },
@@ -1131,6 +1241,9 @@ isOneToOne: false
                            },
 "mark_refund_processing":
 { Args: { "p_provider_refund_id": string,"p_refund_id": string }; Returns: undefined
+                           },
+"mentions_contact_details":
+{ Args: { "p_text": string }; Returns: boolean
                            },
 "notification_email_outbox":
 { Args: { "p_limit"?: number }; Returns: {
@@ -1167,6 +1280,7 @@ isOneToOne: false
 "payout_reference": string | null,
 "payout_status": Database["public"]['Enums']["payout_status"],
 "price_minor": number,
+"proposal_id": string | null,
 "requirement_id": string | null,
 "revisions_included": number,
 "revisions_used": number,
@@ -1190,6 +1304,9 @@ isOneToOne: false
 "platform_fee_bps":
 { Args: { "p_key": string }; Returns: number
                            },
+"post_proposal_event":
+{ Args: { "p_actor": string,"p_body": string,"p_link_path"?: string,"p_notify_body": string,"p_notify_title": string,"p_notify_type": string,"p_proposal": Omit<Database["public"]['Tables']["chat_proposals"]['Row'], Database["public"]['Tables']["chat_proposals"]['ComputedFields']> }; Returns: undefined
+                           },
 "refresh_specialist_completed_orders":
 { Args: { "p_specialist_id": string }; Returns: undefined
                            },
@@ -1198,6 +1315,9 @@ isOneToOne: false
                            },
 "resolve_dispute":
 { Args: { "p_dispute_id": string,"p_outcome": Database["public"]['Enums']["dispute_outcome"],"p_resolution": string }; Returns: undefined
+                           },
+"respond_to_counter":
+{ Args: { "p_accept": boolean,"p_proposal_id": string }; Returns: string
                            },
 "search_services":
 { Args: { "p_availability"?: Database["public"]['Enums']["availability_status"],"p_category_slug"?: string,"p_limit"?: number,"p_max_delivery_hours"?: number,"p_max_price_minor"?: number,"p_min_price_minor"?: number,"p_min_rating"?: number,"p_offset"?: number,"p_query"?: string,"p_skill_slug"?: string,"p_sort"?: string,"p_specialist_id"?: string }; Returns: {
@@ -1208,6 +1328,9 @@ isOneToOne: false
 { Args: { "p_availability"?: Database["public"]['Enums']["availability_status"],"p_category_slug"?: string,"p_experience"?: Database["public"]['Enums']["experience_level"],"p_limit"?: number,"p_max_starting_price_minor"?: number,"p_min_rating"?: number,"p_offset"?: number,"p_query"?: string,"p_skill_slug"?: string,"p_sort"?: string }; Returns: {
               "availability_status": Database["public"]['Enums']["availability_status"],"avatar_path": string,"city": string,"completed_orders_count": number,"currency": string,"experience_level": Database["public"]['Enums']["experience_level"],"full_name": string,"headline": string,"is_sample": boolean,"rating_avg": number,"rating_count": number,"skills": (string)[],"specialist_id": string,"starting_price_minor": number,"total_count": number,"username": string,"verification_status": Database["public"]['Enums']["verification_status"]
             }[]
+                           },
+"send_proposal":
+{ Args: { "p_conversation_id": string,"p_deliverables": string,"p_delivery_time_hours": number,"p_description": string,"p_price_minor": number,"p_revisions_included": number,"p_service_id"?: string,"p_title": string }; Returns: string
                            },
 "slugify":
 { Args: { "value": string }; Returns: string
@@ -1220,6 +1343,9 @@ isOneToOne: false
                            },
 "try_uuid":
 { Args: { "p_value": string }; Returns: string
+                           },
+"withdraw_proposal":
+{ Args: { "p_proposal_id": string }; Returns: undefined
                            }
           }
           Enums: {

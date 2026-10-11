@@ -1,6 +1,6 @@
 import "server-only";
 import type { ServerSupabaseClient } from "@/lib/supabase/server";
-import { UPLOAD_RULES, verifyFileSignature, type UploadPurpose } from "./file-validation";
+import { baseMimeType, UPLOAD_RULES, verifyFileSignature, type UploadPurpose } from "./file-validation";
 
 export interface InspectedUpload {
   size: number;
@@ -24,7 +24,7 @@ export async function inspectUploadedObject(
   if (error || !info) return { ok: false, error: "We couldn't find that upload. Please try again." };
 
   const size = info.size ?? 0;
-  const contentType = info.contentType ?? "";
+  const contentType = baseMimeType(info.contentType ?? "");
   const reject = async (message: string) => {
     await bucket.remove([path]);
     return { ok: false as const, error: message };
@@ -46,7 +46,7 @@ export async function inspectUploadedObject(
 }
 
 /** Builds the URL of the permission-checked download route for a private file. */
-export function privateFileHref(bucket: "requirement-files" | "order-files", path: string, filename: string): string {
+export function privateFileHref(bucket: "requirement-files" | "order-files" | "chat-files", path: string, filename: string): string {
   const params = new URLSearchParams({ bucket, path, name: filename });
   return `/api/files?${params.toString()}`;
 }
